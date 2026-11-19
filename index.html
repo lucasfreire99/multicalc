@@ -1,0 +1,2338 @@
+
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MultiCalc | Ferramentas de Cálculo</title>
+
+<style>
+:root {
+    --bg: #0b0f0d;
+    --panel: #111815;
+    --panel2: #171f1b;
+    --border: #26352d;
+    --green: #20c879;
+    --green-dark: #123d2b;
+    --text: #edf5ef;
+    --muted: #829189;
+    --danger: #ff6666;
+}
+
+* { box-sizing: border-box; }
+
+body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--text);
+    font-family: Inter, "Segoe UI", Arial, sans-serif;
+    min-height: 100vh;
+}
+
+button, input, select { font: inherit; }
+
+.app {
+    display: flex;
+    min-height: 100vh;
+}
+
+/* SIDEBAR */
+
+.sidebar {
+    width: 245px;
+    background: #0e1411;
+    border-right: 1px solid var(--border);
+    padding: 27px 17px;
+    display: flex;
+    flex-direction: column;
+    flex-shrink: 0;
+}
+
+.logo {
+    display: flex;
+    align-items: center;
+    gap: 11px;
+    padding: 0 8px;
+    margin-bottom: 43px;
+}
+
+.logo-icon {
+    width: 39px;
+    height: 39px;
+    display: grid;
+    place-items: center;
+    background: var(--green-dark);
+    color: var(--green);
+    border-radius: 11px;
+    font-size: 21px;
+    font-weight: bold;
+}
+
+.logo strong { font-size: 19px; letter-spacing: -.5px; }
+.logo span { color: var(--green); }
+
+.menu-label {
+    font-size: 10px;
+    color: var(--muted);
+    letter-spacing: 1.5px;
+    font-weight: bold;
+    padding: 0 10px;
+    margin-bottom: 12px;
+}
+
+.nav-btn {
+    width: 100%;
+    padding: 13px 12px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    border: 1px solid transparent;
+    border-radius: 9px;
+    background: transparent;
+    color: #9baaa1;
+    cursor: pointer;
+    text-align: left;
+    margin-bottom: 5px;
+    transition: .2s;
+    font-size: 13px;
+}
+
+.nav-btn:hover {
+    background: var(--panel2);
+    color: white;
+}
+
+.nav-btn.active {
+    background: var(--green-dark);
+    border-color: #245b40;
+    color: var(--green);
+}
+
+.nav-icon { font-size: 17px; width: 21px; }
+
+.sidebar-footer {
+    margin-top: auto;
+    padding: 14px 9px 0;
+    color: var(--muted);
+    font-size: 11px;
+    border-top: 1px solid var(--border);
+}
+
+/* MAIN */
+
+.main {
+    flex: 1;
+    min-width: 0;
+    padding: 35px 48px;
+    max-width: 1500px;
+}
+
+.topbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 38px;
+}
+
+.breadcrumb {
+    font-size: 12px;
+    color: var(--muted);
+}
+
+.breadcrumb span { color: var(--green); }
+
+.status {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: var(--muted);
+    font-size: 11px;
+}
+
+.status-dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: var(--green);
+    box-shadow: 0 0 10px var(--green);
+}
+
+.heading { margin-bottom: 30px; }
+
+.heading h1 {
+    font-size: 28px;
+    letter-spacing: -.8px;
+    margin: 0 0 9px;
+}
+
+.heading p {
+    color: var(--muted);
+    font-size: 13px;
+    margin: 0;
+    line-height: 1.6;
+}
+
+/* TOOL CONTENT */
+
+.tool { display: none; }
+.tool.active { display: block; }
+
+.workspace {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 310px;
+    gap: 22px;
+    align-items: start;
+}
+
+.card {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 13px;
+    padding: 25px;
+}
+
+.card-title {
+    font-size: 15px;
+    font-weight: 650;
+    margin: 0 0 7px;
+}
+
+.card-subtitle {
+    font-size: 12px;
+    color: var(--muted);
+    margin-bottom: 25px;
+    line-height: 1.5;
+}
+
+.field { margin-bottom: 19px; }
+
+.field label {
+    display: block;
+    color: #bac8bf;
+    font-size: 12px;
+    margin-bottom: 9px;
+    font-weight: 600;
+}
+
+input, select {
+    width: 100%;
+    height: 45px;
+    border: 1px solid var(--border);
+    background: #0c120f;
+    color: var(--text);
+    padding: 0 13px;
+    border-radius: 8px;
+    outline: none;
+    transition: .2s;
+}
+
+input:focus, select:focus {
+    border-color: var(--green);
+    box-shadow: 0 0 0 3px #20c87918;
+}
+
+input::placeholder { color: #526057; }
+
+.btn {
+    width: 100%;
+    height: 46px;
+    border: none;
+    background: var(--green);
+    color: #062015;
+    font-weight: 750;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: .2s;
+}
+
+.btn:hover { background: #43df94; transform: translateY(-1px); }
+
+.btn-secondary {
+    background: var(--panel2);
+    color: #c3d0c7;
+    border: 1px solid var(--border);
+}
+
+.btn-secondary:hover {
+    background: #202c25;
+    color: white;
+}
+
+/* RESULT */
+
+.result-box {
+    background: #0d1912;
+    border: 1px solid #24553b;
+    border-radius: 10px;
+    padding: 18px;
+    margin-top: 20px;
+    display: none;
+}
+
+.result-label {
+    color: var(--muted);
+    font-size: 10px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    margin-bottom: 10px;
+}
+
+.result-value {
+    color: var(--green);
+    font-size: 25px;
+    font-weight: 750;
+    overflow-wrap: anywhere;
+}
+
+.result-description {
+    color: #9eaea3;
+    font-size: 12px;
+    margin-top: 8px;
+    line-height: 1.6;
+}
+
+.result-actions {
+    display: flex;
+    gap: 9px;
+    margin-top: 15px;
+}
+
+.result-actions button {
+    padding: 9px 13px;
+    border-radius: 7px;
+    border: 1px solid var(--border);
+    background: var(--panel2);
+    color: #cbd8ce;
+    font-size: 11px;
+    cursor: pointer;
+}
+
+/* SIDE INFO */
+
+.info-card {
+    background: #111a15;
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 21px;
+}
+
+.info-icon {
+    font-size: 23px;
+    margin-bottom: 14px;
+}
+
+.info-card h3 {
+    font-size: 13px;
+    margin: 0 0 10px;
+}
+
+.info-card p {
+    font-size: 12px;
+    line-height: 1.8;
+    color: var(--muted);
+    margin: 0;
+}
+
+.formula {
+    margin-top: 18px;
+    padding: 13px;
+    background: #0b100d;
+    border-radius: 8px;
+    color: var(--green);
+    font-size: 12px;
+    text-align: center;
+}
+
+/* PERCENTAGE MENU */
+
+.tabs {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 23px;
+}
+
+.tab {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    color: var(--muted);
+    border-radius: 7px;
+    padding: 11px 14px;
+    font-size: 11px;
+    cursor: pointer;
+}
+
+.tab.active {
+    background: var(--green-dark);
+    border-color: #286143;
+    color: var(--green);
+}
+
+.percent-panel { display: none; }
+.percent-panel.active { display: block; }
+
+.two-columns {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 15px;
+}
+
+/* RULE OF THREE */
+
+.rule-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 15px;
+    margin-bottom: 17px;
+}
+
+.rule-item {
+    padding: 16px;
+    border: 1px solid var(--border);
+    background: #0d130f;
+    border-radius: 9px;
+}
+
+.rule-item label {
+    display: block;
+    font-size: 11px;
+    color: var(--muted);
+    margin-bottom: 10px;
+}
+
+.rule-item input {
+    font-size: 19px;
+    font-weight: bold;
+    border: none;
+    background: transparent;
+    padding: 0;
+    height: 30px;
+}
+
+.rule-item.unknown {
+    border-color: #286143;
+    background: #102017;
+}
+
+.rule-item.unknown label { color: var(--green); }
+
+/* MOBILE */
+
+@media(max-width: 900px) {
+    .main { padding: 28px 22px; }
+    .workspace { grid-template-columns: 1fr; }
+    .sidebar { width: 205px; }
+}
+
+@media(max-width: 650px) {
+    .app { flex-direction: column; }
+    .sidebar {
+        width: 100%;
+        padding: 13px;
+        border-right: none;
+        border-bottom: 1px solid var(--border);
+    }
+    .logo { margin-bottom: 14px; }
+    .menu-label, .sidebar-footer { display: none; }
+    .navigation {
+        display: flex;
+        gap: 5px;
+        overflow-x: auto;
+    }
+    .nav-btn {
+        width: auto;
+        min-width: max-content;
+        margin: 0;
+        padding: 10px;
+        font-size: 11px;
+    }
+    .main { padding: 23px 15px; }
+    .topbar { margin-bottom: 25px; }
+    .heading h1 { font-size: 23px; }
+    .card { padding: 18px; }
+    .two-columns, .rule-grid { grid-template-columns: 1fr 1fr; }
+    .status { display: none; }
+}
+
+@media(max-width: 380px) {
+    .two-columns, .rule-grid { grid-template-columns: 1fr; }
+}
+
+/* ===== NOVAS FERRAMENTAS ===== */
+
+input[type=date], input[type=datetime-local] { color-scheme: dark; }
+textarea {
+    width: 100%;
+    min-height: 150px;
+    border: 1px solid var(--border);
+    background: #0c120f;
+    color: var(--text);
+    padding: 12px 13px;
+    border-radius: 8px;
+    outline: none;
+    resize: vertical;
+    font: inherit;
+    font-size: 13px;
+    line-height: 1.6;
+    transition: .2s;
+}
+textarea:focus { border-color: var(--green); box-shadow: 0 0 0 3px #20c87918; }
+textarea[readonly] { background: #0d1912; border-color: #24553b; }
+.check {
+    display: flex; align-items: center; gap: 9px;
+    font-size: 12px; color: #bac8bf; margin-bottom: 11px; cursor: pointer;
+}
+.check input { width: 16px; height: 16px; accent-color: var(--green); flex-shrink: 0; }
+.btn-row { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 4px; }
+.btn-row .btn { flex: 1; min-width: 140px; }
+.stat-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 10px; margin-top: 14px;
+}
+.stat-grid:empty { display: none; }
+.stat { background: #0b100d; border: 1px solid var(--border); border-radius: 8px; padding: 11px 12px; }
+.stat b { display: block; color: var(--green); font-size: 14px; margin-bottom: 4px; overflow-wrap: anywhere; }
+.stat span { font-size: 10px; color: var(--muted); text-transform: uppercase; letter-spacing: .8px; }
+.nav-group-label { margin-top: 18px; }
+.mtab {
+    background: var(--panel); border: 1px solid var(--border); color: var(--muted);
+    border-radius: 7px; padding: 11px 14px; font-size: 11px; cursor: pointer;
+}
+.mtab.active { background: var(--green-dark); border-color: #286143; color: var(--green); }
+.mpanel { display: none; }
+.mpanel.active { display: block; }
+.out-note { font-size: 11px; color: var(--muted); margin: 9px 0 0; line-height: 1.6; }
+.sep { height: 1px; background: var(--border); margin: 22px 0; }
+
+.imc-bar {
+    height: 10px; border-radius: 6px; position: relative; margin: 18px 0 6px;
+    background: linear-gradient(90deg, #4aa3ff 0 14%, #20c879 14% 40%, #f2c94c 40% 60%, #ff9f43 60% 80%, #ff6666 80% 100%);
+}
+.imc-marker { position: absolute; top: -4px; width: 4px; height: 18px; background: #fff; border-radius: 2px; left: 0; }
+
+.preview-wrap {
+    margin-top: 22px; padding: 18px; background: #0b100d;
+    border: 1px dashed var(--border); border-radius: 10px; overflow: auto;
+}
+.preview-wrap:empty { display: none; }
+.etiquetas { display: flex; flex-wrap: wrap; gap: .3cm; }
+.etiqueta {
+    background: #fff; color: #111; border: 1px dashed #999; display: flex;
+    overflow: hidden; font-family: Arial, Helvetica, sans-serif; flex-shrink: 0;
+}
+.etiqueta .faixa { width: .35cm; flex-shrink: 0; }
+.etiqueta .corpo {
+    flex: 1; min-width: 0; padding: .2cm .3cm; display: flex;
+    flex-direction: column; justify-content: center; gap: .08cm; overflow: hidden;
+}
+.etiqueta .tag { font-size: .6em; letter-spacing: 1px; color: #666; font-weight: bold; }
+.etiqueta .titulo { font-size: 1.35em; font-weight: 800; line-height: 1.15; overflow-wrap: anywhere; }
+.etiqueta .linha { font-size: .85em; color: #333; overflow-wrap: anywhere; }
+
+.cracha {
+    width: 5.4cm; height: 8.6cm; background: #fff; color: #111; border-radius: .3cm;
+    overflow: hidden; display: flex; flex-direction: column; align-items: center;
+    font-family: Arial, Helvetica, sans-serif; border: 1px solid #ccc; margin: 0 auto;
+}
+.cracha .topo { width: 100%; padding: .35cm .3cm; text-align: center; color: #fff; font-weight: bold; font-size: 10pt; min-height: 1.4cm; display: grid; place-items: center; overflow-wrap: anywhere; }
+.cracha .foto {
+    width: 3cm; height: 3.5cm; margin: .45cm 0 .3cm; border-radius: .25cm; overflow: hidden;
+    background: #e6e9e7; display: grid; place-items: center; font-size: 26pt; font-weight: bold; color: #888; border: 2px solid #ddd;
+}
+.cracha .foto img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.cracha .nome { font-size: 13pt; font-weight: 800; text-align: center; padding: 0 .3cm; line-height: 1.15; overflow-wrap: anywhere; }
+.cracha .cargo { font-size: 9.5pt; color: #444; text-align: center; padding: .1cm .3cm 0; }
+.cracha .matricula { margin-top: auto; font-size: 8pt; color: #555; padding-bottom: .2cm; letter-spacing: 1px; }
+.cracha .rodape { width: 100%; height: .4cm; flex-shrink: 0; }
+
+.papel {
+    background: #fff; color: #111; padding: 30px 34px; border-radius: 4px; max-width: 720px;
+    margin: 0 auto; font-family: Arial, Helvetica, sans-serif; font-size: 13px; line-height: 1.5;
+}
+.papel h2 { font-size: 16px; text-align: center; margin: 0 0 4px; letter-spacing: .5px; }
+.papel .num { text-align: center; color: #555; margin-bottom: 18px; font-size: 12px; }
+.papel table { width: 100%; border-collapse: collapse; margin-bottom: 36px; }
+.papel td { border: 1px solid #bbb; padding: 8px 10px; vertical-align: top; }
+.papel td:first-child { width: 28%; background: #f3f3f3; font-weight: bold; }
+.papel .assinaturas { display: flex; gap: 30px; margin-top: 46px; }
+.papel .assina { flex: 1; text-align: center; border-top: 1px solid #111; padding-top: 6px; font-size: 12px; }
+.papel .assina small { display: block; color: #555; }
+.papel .rod { margin-top: 26px; font-size: 10px; color: #777; text-align: center; }
+
+@media(min-width: 651px) {
+    .sidebar { position: sticky; top: 0; height: 100vh; overflow-y: auto; }
+}
+@media print {
+    @page { margin: 1cm; }
+    .print-area, .print-area * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
+    body * { visibility: hidden !important; }
+    .print-area, .print-area * { visibility: visible !important; }
+    .print-area { position: absolute; left: 0; top: 0; width: 100%; }
+    body { background: #fff !important; }
+    .preview-wrap { border: none; background: none; padding: 0; }
+}
+
+.cracha { position: relative; }
+.cracha .corpo { flex: 1; width: 100%; min-height: 0; display: flex; flex-direction: column; align-items: center; }
+.cracha .txt { flex: 1; width: 100%; display: flex; flex-direction: column; align-items: center; min-width: 0; }
+.cracha .matricula { margin-top: auto; }
+.cracha .furo {
+    position: absolute; top: .22cm; left: 50%; transform: translateX(-50%);
+    width: 1.3cm; height: .3cm; border-radius: .15cm; background: #fff; border: 1px solid #888; z-index: 2;
+}
+.cracha.com-furo .topo { padding-top: .75cm; }
+.cracha.h { width: 8.6cm; height: 5.4cm; }
+.cracha.h .topo { min-height: 1cm; padding: .2cm .3cm; }
+.cracha.h.com-furo .topo { padding-top: .6cm; }
+.cracha.h .corpo { flex-direction: row; align-items: center; padding: 0 .35cm; gap: .35cm; }
+.cracha.h .foto { margin: 0; width: 2.5cm; height: 3cm; flex-shrink: 0; }
+.cracha.h .txt { align-items: flex-start; text-align: left; justify-content: center; }
+.cracha.h .nome, .cracha.h .cargo { padding-left: 0; padding-right: 0; text-align: left; }
+.cracha.h .matricula { margin-top: .2cm; padding-bottom: 0; }
+
+.hist { max-height: 300px; overflow: auto; border: 1px solid var(--border); border-radius: 8px; background: #0b100d; margin-bottom: 12px; }
+.hist-item { display: flex; gap: 10px; padding: 9px 12px; border-bottom: 1px solid var(--border); font-size: 12px; line-height: 1.5; }
+.hist-item:last-child { border-bottom: none; }
+.hist-n { color: var(--muted); min-width: 28px; }
+.hist-h { color: var(--muted); white-space: nowrap; }
+.hist-t { color: var(--green); font-weight: 600; white-space: nowrap; }
+.hist-r { overflow-wrap: anywhere; min-width: 0; }
+.hist-vazio { padding: 16px; color: var(--muted); font-size: 12px; text-align: center; }
+
+</style>
+</head>
+
+<body>
+<div class="app">
+
+    <aside class="sidebar">
+        <div class="logo">
+            <div class="logo-icon">∑</div>
+            <strong>Multi<span>Calc</span></strong>
+        </div>
+
+        <nav class="navigation">
+            <div class="menu-label">CÁLCULOS</div>
+            <button class="nav-btn active" data-tool="extenso">
+                <span class="nav-icon">✍</span> Números por Extenso
+            </button>
+            <button class="nav-btn" data-tool="regra">
+                <span class="nav-icon">∝</span> Regra de 3 Simples
+            </button>
+            <button class="nav-btn" data-tool="porcentagem">
+                <span class="nav-icon">％</span> Porcentagem
+            </button>
+            <button class="nav-btn" data-tool="imc">
+                <span class="nav-icon">⚖</span> Calculadora de IMC
+            </button>
+            <button class="nav-btn" data-tool="unidades">
+                <span class="nav-icon">⇄</span> Conversor de Unidades
+            </button>
+            <div class="menu-label nav-group-label">DATAS</div>
+            <button class="nav-btn" data-tool="signos">
+                <span class="nav-icon">♈</span> Signos do Zodíaco
+            </button>
+            <button class="nav-btn" data-tool="idade">
+                <span class="nav-icon">🎂</span> Calcular Idade
+            </button>
+            <button class="nav-btn" data-tool="somardias">
+                <span class="nav-icon">➕</span> Somar Dias
+            </button>
+            <button class="nav-btn" data-tool="contador">
+                <span class="nav-icon">📅</span> Contador de Dias
+            </button>
+            <div class="menu-label nav-group-label">TEXTO</div>
+            <button class="nav-btn" data-tool="formatador">
+                <span class="nav-icon">¶</span> Formatador de Texto
+            </button>
+            <button class="nav-btn" data-tool="caixa">
+                <span class="nav-icon">Aa</span> Maiúsculas e Minúsculas
+            </button>
+            <button class="nav-btn" data-tool="nomes">
+                <span class="nav-icon">🔤</span> Organizador de Nomes
+            </button>
+            <div class="menu-label nav-group-label">DOCUMENTOS</div>
+            <button class="nav-btn" data-tool="etiquetas">
+                <span class="nav-icon">🏷</span> Gerador de Etiquetas
+            </button>
+            <button class="nav-btn" data-tool="crachas">
+                <span class="nav-icon">🪪</span> Gerador de Crachás
+            </button>
+            <button class="nav-btn" data-tool="protocolos">
+                <span class="nav-icon">📄</span> Gerador de Protocolos
+            </button>
+            <div class="menu-label nav-group-label">SORTEIO</div>
+            <button class="nav-btn" data-tool="aleatorio">
+                <span class="nav-icon">🎲</span> Sorteios e Aleatórios
+            </button>
+        </nav>
+
+        <div class="sidebar-footer">
+            MultiCalc v2.0<br>
+            Ferramentas inteligentes
+        </div>
+    </aside>
+
+    <main class="main">
+
+        <div class="topbar">
+            <div class="breadcrumb">Ferramentas / <span id="breadcrumb">Números por Extenso</span></div>
+            <div class="status">
+                <span class="status-dot"></span>
+                Sistema operacional
+            </div>
+        </div>
+
+        <!-- NÚMEROS POR EXTENSO -->
+
+        <section class="tool active" id="extenso">
+            <div class="heading">
+                <h1>Números por Extenso</h1>
+                <p>Transforme números em palavras de maneira rápida e prática.</p>
+            </div>
+
+            <div class="workspace">
+                <div class="card">
+                    <h3 class="card-title">Conversor de números</h3>
+                    <p class="card-subtitle">Digite um número para realizar a conversão.</p>
+
+                    <div class="field">
+                        <label>Valor numérico</label>
+                        <input id="numero" type="text" placeholder="Ex.: 1250,50">
+                    </div>
+
+                    <div class="field">
+                        <label>Formato de conversão</label>
+                        <select id="formato">
+                            <option value="simples">Número por extenso</option>
+                            <option value="moeda">Valor em Reais (R$)</option>
+                        </select>
+                    </div>
+
+                    <button class="btn" onclick="converterExtenso()">Converter número</button>
+
+                    <div class="result-box" id="resultadoExtenso">
+                        <div class="result-label">Resultado da conversão</div>
+                        <div class="result-description" id="textoExtenso"></div>
+                        <div class="result-actions">
+                            <button onclick="copiar('textoExtenso')">▣ Copiar resultado</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="info-card">
+                    <div class="info-icon">✍️</div>
+                    <h3>Conversão inteligente</h3>
+                    <p>Converta números inteiros e decimais em texto. Utilize o formato monetário para gerar valores em reais e centavos.</p>
+                    <div class="formula">Ex.: 1.250,50</div>
+                    <p style="margin-top:13px">Resultado: mil duzentos e cinquenta reais e cinquenta centavos.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- REGRA DE 3 -->
+
+        <section class="tool" id="regra">
+            <div class="heading">
+                <h1>Regra de 3 Simples</h1>
+                <p>Descubra o valor desconhecido a partir de três valores conhecidos.</p>
+            </div>
+
+            <div class="workspace">
+                <div class="card">
+                    <h3 class="card-title">Calculadora de proporção</h3>
+                    <p class="card-subtitle">Preencha os três valores conhecidos.</p>
+
+                    <div class="rule-grid">
+                        <div class="rule-item">
+                            <label>Valor A</label>
+                            <input type="number" id="ra" placeholder="Ex.: 10">
+                        </div>
+                        <div class="rule-item">
+                            <label>Valor B</label>
+                            <input type="number" id="rb" placeholder="Ex.: 20">
+                        </div>
+                        <div class="rule-item">
+                            <label>Valor C</label>
+                            <input type="number" id="rc" placeholder="Ex.: 5">
+                        </div>
+                        <div class="rule-item unknown">
+                            <label>Valor X (desconhecido)</label>
+                            <input type="text" value="?" disabled>
+                        </div>
+                    </div>
+
+                    <button class="btn" onclick="calcularRegra()">Calcular resultado</button>
+
+                    <div class="result-box" id="resultadoRegra">
+                        <div class="result-label">Valor encontrado</div>
+                        <div class="result-value" id="valorRegra"></div>
+                        <div class="result-description" id="detalheRegra"></div>
+                        <div class="result-actions">
+                            <button onclick="copiar('valorRegra')">▣ Copiar resultado</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="info-card">
+                    <div class="info-icon">📐</div>
+                    <h3>Como funciona?</h3>
+                    <p>A regra de três simples estabelece uma relação entre quatro valores proporcionais, permitindo encontrar um valor desconhecido.</p>
+                    <div class="formula">A × X = B × C<br><br>X = (B × C) ÷ A</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- PORCENTAGEM -->
+
+        <section class="tool" id="porcentagem">
+            <div class="heading">
+                <h1>Calculadora de Porcentagem</h1>
+                <p>Realize cálculos percentuais de forma simples e precisa.</p>
+            </div>
+
+            <div class="tabs">
+                <button class="tab active" data-percent="p1">Porcentagem de um valor</button>
+                <button class="tab" data-percent="p2">Entre dois valores</button>
+                <button class="tab" data-percent="p3">Variação percentual</button>
+                <button class="tab" data-percent="p4">Acréscimo</button>
+                <button class="tab" data-percent="p5">Desconto</button>
+            </div>
+
+            <div class="workspace">
+                <div class="card">
+
+                    <!-- PORCENTAGEM DE UM VALOR -->
+                    <div class="percent-panel active" id="p1">
+                        <h3 class="card-title">Porcentagem de um valor</h3>
+                        <p class="card-subtitle">Descubra quanto representa uma porcentagem de determinado valor.</p>
+                        <div class="field">
+                            <label>Porcentagem (%)</label>
+                            <input type="number" id="p1a" placeholder="Ex.: 15">
+                        </div>
+                        <div class="field">
+                            <label>Valor base</label>
+                            <input type="number" id="p1b" placeholder="Ex.: 1000">
+                        </div>
+                        <button class="btn" onclick="calcularPercentual('p1')">Calcular porcentagem</button>
+                    </div>
+
+                    <!-- ENTRE DOIS VALORES -->
+                    <div class="percent-panel" id="p2">
+                        <h3 class="card-title">Porcentagem entre dois valores</h3>
+                        <p class="card-subtitle">Descubra qual percentual um valor representa em relação a outro.</p>
+                        <div class="field">
+                            <label>Valor parcial</label>
+                            <input type="number" id="p2a" placeholder="Ex.: 25">
+                        </div>
+                        <div class="field">
+                            <label>Valor total</label>
+                            <input type="number" id="p2b" placeholder="Ex.: 100">
+                        </div>
+                        <button class="btn" onclick="calcularPercentual('p2')">Calcular percentual</button>
+                    </div>
+
+                    <!-- VARIAÇÃO -->
+                    <div class="percent-panel" id="p3">
+                        <h3 class="card-title">Variação percentual</h3>
+                        <p class="card-subtitle">Compare dois valores e identifique o percentual de aumento ou redução.</p>
+                        <div class="field">
+                            <label>Valor inicial</label>
+                            <input type="number" id="p3a" placeholder="Ex.: 100">
+                        </div>
+                        <div class="field">
+                            <label>Valor final</label>
+                            <input type="number" id="p3b" placeholder="Ex.: 150">
+                        </div>
+                        <button class="btn" onclick="calcularPercentual('p3')">Calcular variação</button>
+                    </div>
+
+                    <!-- ACRÉSCIMO -->
+                    <div class="percent-panel" id="p4">
+                        <h3 class="card-title">Acréscimo percentual</h3>
+                        <p class="card-subtitle">Calcule o valor final após aplicar um aumento percentual.</p>
+                        <div class="field">
+                            <label>Valor original</label>
+                            <input type="number" id="p4a" placeholder="Ex.: 1000">
+                        </div>
+                        <div class="field">
+                            <label>Acréscimo (%)</label>
+                            <input type="number" id="p4b" placeholder="Ex.: 10">
+                        </div>
+                        <button class="btn" onclick="calcularPercentual('p4')">Calcular acréscimo</button>
+                    </div>
+
+                    <!-- DESCONTO -->
+                    <div class="percent-panel" id="p5">
+                        <h3 class="card-title">Desconto percentual</h3>
+                        <p class="card-subtitle">Calcule o valor final após aplicar um desconto percentual.</p>
+                        <div class="field">
+                            <label>Valor original</label>
+                            <input type="number" id="p5a" placeholder="Ex.: 1000">
+                        </div>
+                        <div class="field">
+                            <label>Desconto (%)</label>
+                            <input type="number" id="p5b" placeholder="Ex.: 15">
+                        </div>
+                        <button class="btn" onclick="calcularPercentual('p5')">Calcular desconto</button>
+                    </div>
+
+                    <div class="result-box" id="resultadoPercentual">
+                        <div class="result-label" id="tituloPercentual">Resultado</div>
+                        <div class="result-value" id="valorPercentual"></div>
+                        <div class="result-description" id="detalhePercentual"></div>
+                        <div class="result-actions">
+                            <button onclick="copiar('valorPercentual')">▣ Copiar resultado</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="info-card">
+                    <div class="info-icon">％</div>
+                    <h3>Precisão nos cálculos</h3>
+                    <p>Utilize as ferramentas para calcular percentuais, comparar valores, identificar variações e simular acréscimos ou descontos.</p>
+                    <div class="formula">Porcentagem = (Parte ÷ Total) × 100</div>
+                </div>
+            </div>
+        </section>
+
+
+        <section class="tool" id="imc">
+            <div class="heading">
+                <h1>Calculadora de IMC</h1>
+                <p>Descubra seu Índice de Massa Corporal e a faixa de peso considerada saudável.</p>
+            </div>
+            <div class="workspace">
+                <div class="card">
+<div class="two-columns">
+                        <div class="field"><label>Peso (kg)</label><input type="text" inputmode="decimal" id="imc_peso" placeholder="Ex.: 70"></div>
+                        <div class="field"><label>Altura (cm ou m)</label><input type="text" inputmode="decimal" id="imc_alt" placeholder="Ex.: 175 ou 1,75"></div>
+                    </div>
+                    <button class="btn" onclick="calcularIMC()">Calcular IMC</button>
+                    <div class="result-box" id="r_imc">
+                        <div class="result-label" id="l_imc">Seu IMC</div>
+                        <div class="result-value" id="v_imc"></div>
+                        <div class="result-description" id="d_imc"></div>
+                        <div class="imc-bar"><div class="imc-marker" id="imc_mk"></div></div>
+                        <div class="stat-grid" id="s_imc"></div>
+                        <div class="result-actions"><button onclick="copiar('v_imc')">▣ Copiar resultado</button></div>
+                    </div>
+                </div>
+                <div class="info-card">
+                    <div class="info-icon">⚖️</div>
+                    <h3>Como é calculado?</h3>
+                    <p>IMC = peso ÷ altura². Classificação da OMS para adultos. É um indicador geral e não substitui avaliação profissional, pois não considera massa muscular, idade ou sexo.</p>
+                    <div class="formula">IMC = kg ÷ (m × m)</div>
+                </div>
+            </div>
+        </section>
+
+        <section class="tool" id="unidades">
+            <div class="heading">
+                <h1>Conversor de Unidades</h1>
+                <p>Converta comprimento, peso, temperatura, volume, área, velocidade, dados e mais.</p>
+            </div>
+            <div class="workspace">
+                <div class="card">
+<div class="field"><label>Categoria</label><select id="un_cat" onchange="trocarCategoria()"></select></div>
+                    <div class="field"><label>Valor</label><input type="text" inputmode="decimal" id="un_val" placeholder="Ex.: 10" oninput="converterUnidade()"></div>
+                    <div class="two-columns">
+                        <div class="field"><label>De</label><select id="un_de" onchange="converterUnidade()"></select></div>
+                        <div class="field"><label>Para</label><select id="un_para" onchange="converterUnidade()"></select></div>
+                    </div>
+                    <div class="btn-row">
+                        <button class="btn" onclick="converterUnidade()">Converter</button>
+                        <button class="btn btn-secondary" onclick="inverterUnidades()">⇄ Inverter unidades</button>
+                    </div>
+                    <div class="result-box" id="r_un">
+                        <div class="result-label" id="l_un">Resultado</div>
+                        <div class="result-value" id="v_un"></div>
+                        <div class="result-description" id="d_un"></div>
+                        <div class="stat-grid" id="s_un"></div>
+                        <div class="result-actions"><button onclick="copiar('v_un')">▣ Copiar resultado</button></div>
+                    </div>
+                </div>
+                <div class="info-card">
+                    <div class="info-icon">⇄</div>
+                    <h3>Métrico e imperial</h3>
+                    <p>Os valores são convertidos para uma unidade base e depois para a unidade de destino. Abaixo do resultado aparece o valor em todas as unidades da categoria. Em dados, KB = 1000 bytes e KiB = 1024 bytes.</p>
+                    
+                </div>
+            </div>
+        </section>
+
+        <section class="tool" id="signos">
+            <div class="heading">
+                <h1>Signos do Zodíaco</h1>
+                <p>Descubra seu signo a partir da data de nascimento.</p>
+            </div>
+            <div class="workspace">
+                <div class="card">
+<div class="field"><label>Data de nascimento</label><input type="date" id="sg_data"></div>
+                    <button class="btn" onclick="calcularSigno()">Descobrir meu signo</button>
+                    <div class="result-box" id="r_sg">
+                        <div class="result-label" id="l_sg">Seu signo</div>
+                        <div class="result-value" id="v_sg"></div>
+                        <div class="result-description" id="d_sg"></div>
+                        <div class="stat-grid" id="s_sg"></div>
+                        <div class="result-actions"><button onclick="copiar('v_sg')">▣ Copiar resultado</button></div>
+                    </div>
+                </div>
+                <div class="info-card">
+                    <div class="info-icon">♈</div>
+                    <h3>Datas de transição</h3>
+                    <p>Quem nasce nos dias de virada entre dois signos pode ter o signo diferente conforme o ano e o horário exato. As datas usadas são as do zodíaco tropical, as mais comuns.</p>
+                    
+                </div>
+            </div>
+        </section>
+
+        <section class="tool" id="idade">
+            <div class="heading">
+                <h1>Calcular Idade</h1>
+                <p>Veja sua idade detalhada em anos, meses, dias e muito mais.</p>
+            </div>
+            <div class="workspace">
+                <div class="card">
+<div class="two-columns">
+                        <div class="field"><label>Data de nascimento</label><input type="date" id="id_nasc"></div>
+                        <div class="field"><label>Calcular até (opcional)</label><input type="date" id="id_ref"></div>
+                    </div>
+                    <button class="btn" onclick="calcularIdade()">Calcular idade</button>
+                    <div class="result-box" id="r_id">
+                        <div class="result-label" id="l_id">Sua idade</div>
+                        <div class="result-value" id="v_id"></div>
+                        <div class="result-description" id="d_id"></div>
+                        <div class="stat-grid" id="s_id"></div>
+                        <div class="result-actions"><button onclick="copiar('v_id')">▣ Copiar resultado</button></div>
+                    </div>
+                </div>
+                <div class="info-card">
+                    <div class="info-icon">🎂</div>
+                    <h3>Idade exata</h3>
+                    <p>Deixe a segunda data em branco para usar o dia de hoje. Também mostra quantos dias faltam para o próximo aniversário.</p>
+                    
+                </div>
+            </div>
+        </section>
+
+        <section class="tool" id="somardias">
+            <div class="heading">
+                <h1>Somar Dias</h1>
+                <p>Adicione ou subtraia dias, semanas, meses, anos ou dias úteis de uma data.</p>
+            </div>
+            <div class="workspace">
+                <div class="card">
+<div class="field"><label>Data inicial</label><input type="date" id="sd_data"></div>
+                    <div class="two-columns">
+                        <div class="field"><label>Operação</label><select id="sd_op"><option value="1">Somar (+)</option><option value="-1">Subtrair (−)</option></select></div>
+                        <div class="field"><label>Quantidade</label><input type="number" id="sd_qtd" placeholder="Ex.: 30" min="0"></div>
+                    </div>
+                    <div class="field"><label>Unidade</label><select id="sd_unid"><option value="dias">Dias corridos</option><option value="uteis">Dias úteis (seg–sex)</option><option value="semanas">Semanas</option><option value="meses">Meses</option><option value="anos">Anos</option></select></div>
+                    <button class="btn" onclick="calcularSomaDias()">Calcular data</button>
+                    <div class="result-box" id="r_sd">
+                        <div class="result-label" id="l_sd">Data resultante</div>
+                        <div class="result-value" id="v_sd"></div>
+                        <div class="result-description" id="d_sd"></div>
+                        <div class="stat-grid" id="s_sd"></div>
+                        <div class="result-actions"><button onclick="copiar('v_sd')">▣ Copiar resultado</button></div>
+                    </div>
+                </div>
+                <div class="info-card">
+                    <div class="info-icon">➕</div>
+                    <h3>Prazos e vencimentos</h3>
+                    <p>Útil para prazos, vencimentos e agendamentos. Dias úteis ignoram apenas sábados e domingos; feriados não são considerados.</p>
+                    
+                </div>
+            </div>
+        </section>
+
+        <section class="tool" id="contador">
+            <div class="heading">
+                <h1>Contador de Dias</h1>
+                <p>Calcule a diferença entre duas datas.</p>
+            </div>
+            <div class="workspace">
+                <div class="card">
+<div class="two-columns">
+                        <div class="field"><label>Data inicial</label><input type="date" id="cd_a"></div>
+                        <div class="field"><label>Data final</label><input type="date" id="cd_b"></div>
+                    </div>
+                    <label class="check"><input type="checkbox" id="cd_incl"> Incluir o dia final na contagem</label>
+                    <button class="btn" onclick="calcularContador()">Calcular diferença</button>
+                    <div class="result-box" id="r_cd">
+                        <div class="result-label" id="l_cd">Diferença</div>
+                        <div class="result-value" id="v_cd"></div>
+                        <div class="result-description" id="d_cd"></div>
+                        <div class="stat-grid" id="s_cd"></div>
+                        <div class="result-actions"><button onclick="copiar('v_cd')">▣ Copiar resultado</button></div>
+                    </div>
+                </div>
+                <div class="info-card">
+                    <div class="info-icon">📅</div>
+                    <h3>Entre duas datas</h3>
+                    <p>Mostra o total de dias, semanas, o intervalo em anos/meses/dias e quantos dias úteis (segunda a sexta) existem no período.</p>
+                    
+                </div>
+            </div>
+        </section>
+
+        <section class="tool" id="formatador">
+            <div class="heading">
+                <h1>Formatador de Texto</h1>
+                <p>Limpe e ajuste textos em poucos cliques.</p>
+            </div>
+            <div class="workspace">
+                <div class="card">
+<div class="field"><label>Texto original</label><textarea id="ft_in" placeholder="Cole ou digite seu texto aqui..."></textarea></div>
+                    <label class="check"><input type="checkbox" id="ft_esp" checked> Remover espaços duplicados e espaços nas pontas das linhas</label>
+                    <label class="check"><input type="checkbox" id="ft_vaz" checked> Remover linhas vazias</label>
+                    <label class="check"><input type="checkbox" id="ft_esc"> Remover caracteres especiais (mantém letras, números e pontuação básica)</label>
+                    <label class="check"><input type="checkbox" id="ft_par"> Ajustar parágrafos (une linhas quebradas no meio da frase)</label>
+                    <button class="btn" onclick="formatarTexto()">Formatar texto</button>
+                    <div class="field" style="margin-top:20px"><label>Resultado</label>
+                        <textarea id="ft_out" readonly placeholder="O resultado aparece aqui."></textarea>
+                        <p class="out-note" id="ft_info"></p>
+                        <div class="result-actions"><button onclick="copiar('ft_out')">▣ Copiar resultado</button></div></div>
+                </div>
+                <div class="info-card">
+                    <div class="info-icon">¶</div>
+                    <h3>Limpeza de texto</h3>
+                    <p>Ideal para textos copiados de PDFs, e-mails e planilhas. “Ajustar parágrafos” junta as linhas de cada parágrafo, separados por linha em branco.</p>
+                    
+                </div>
+            </div>
+        </section>
+
+        <section class="tool" id="caixa">
+            <div class="heading">
+                <h1>Maiúsculas e Minúsculas</h1>
+                <p>Alterne entre MAIÚSCULAS, minúsculas e Primeira Letra Maiúscula.</p>
+            </div>
+            <div class="workspace">
+                <div class="card">
+<div class="field"><label>Texto</label><textarea id="cx_in" placeholder="Digite ou cole o texto..."></textarea></div>
+                    <label class="check"><input type="checkbox" id="cx_prep" checked> Manter “de”, “da”, “do”, “e”... em minúsculas (Primeira Letra Maiúscula)</label>
+                    <div class="btn-row">
+                        <button class="btn" onclick="converterCaixa('upper')">MAIÚSCULAS</button>
+                        <button class="btn" onclick="converterCaixa('lower')">minúsculas</button>
+                        <button class="btn" onclick="converterCaixa('title')">Primeira Letra Maiúscula</button>
+                        <button class="btn btn-secondary" onclick="converterCaixa('frase')">Frase.</button>
+                    </div>
+                    <div class="field" style="margin-top:20px"><label>Resultado</label>
+                        <textarea id="cx_out" readonly placeholder="O resultado aparece aqui."></textarea>
+                        <p class="out-note" id="cx_info"></p>
+                        <div class="result-actions"><button onclick="copiar('cx_out')">▣ Copiar resultado</button></div></div>
+                </div>
+                <div class="info-card">
+                    <div class="info-icon">Aa</div>
+                    <h3>Quatro modos</h3>
+                    <p>“Frase.” deixa só a primeira letra de cada frase em maiúscula, como em um texto normal.</p>
+                    
+                </div>
+            </div>
+        </section>
+
+        <section class="tool" id="nomes">
+            <div class="heading">
+                <h1>Organizador de Nomes</h1>
+                <p>Ordene alfabeticamente, remova duplicados e padronize listas de nomes.</p>
+            </div>
+            <div class="workspace">
+                <div class="card">
+<div class="field"><label>Lista de nomes (um por linha)</label><textarea id="on_in" placeholder="maria da silva&#10;JOÃO PEREIRA&#10;Ana Souza&#10;maria da silva"></textarea></div>
+                    <div class="field"><label>Ordenação</label><select id="on_ord"><option value="az">A → Z</option><option value="za">Z → A</option><option value="manter">Manter a ordem original</option></select></div>
+                    <label class="check"><input type="checkbox" id="on_dup" checked> Remover duplicados (ignora maiúsculas e acentos)</label>
+                    <label class="check"><input type="checkbox" id="on_pad" checked> Padronizar (Primeira Letra Maiúscula e espaços corretos)</label>
+                    <button class="btn" onclick="organizarNomes()">Organizar nomes</button>
+                    <div class="field" style="margin-top:20px"><label>Resultado</label>
+                        <textarea id="on_out" readonly placeholder="O resultado aparece aqui."></textarea>
+                        <p class="out-note" id="on_info"></p>
+                        <div class="result-actions"><button onclick="copiar('on_out')">▣ Copiar resultado</button></div></div>
+                </div>
+                <div class="info-card">
+                    <div class="info-icon">🔤</div>
+                    <h3>Listas limpas</h3>
+                    <p>A ordenação segue o alfabeto português. Linhas vazias são sempre removidas.</p>
+                    
+                </div>
+            </div>
+        </section>
+
+        <section class="tool" id="etiquetas">
+            <div class="heading">
+                <h1>Gerador de Etiquetas</h1>
+                <p>Crie etiquetas para pastas, materiais e correspondências.</p>
+            </div>
+            <div class="workspace">
+                <div class="card">
+<div class="two-columns">
+                        <div class="field"><label>Tipo</label><select id="et_tipo" onchange="ajustarCamposEtiqueta()"><option value="pasta">Pasta</option><option value="material">Material</option><option value="correio">Correspondência</option></select></div>
+                        <div class="field"><label>Tamanho</label><select id="et_tam"><option value="p">Pequena (6 × 3 cm)</option><option value="m" selected>Média (8 × 4 cm)</option><option value="g">Grande (10 × 5 cm)</option></select></div>
+                    </div>
+                    <div class="field"><label id="et_l1">Nome da pasta</label><input type="text" id="et_c1" placeholder="Ex.: Contratos 2026"></div>
+                    <div class="field"><label id="et_l2">Subtítulo (setor, ano...)</label><input type="text" id="et_c2" placeholder="Ex.: Departamento Jurídico"></div>
+                    <div class="field"><label id="et_l3">Observação</label><input type="text" id="et_c3" placeholder="Ex.: Arquivo permanente"></div>
+                    <div class="two-columns">
+                        <div class="field"><label>Cor da faixa</label><input type="color" id="et_cor" value="#20c879" style="padding:4px"></div>
+                        <div class="field"><label>Cópias de cada etiqueta</label><input type="number" id="et_qtd" value="1" min="1" max="100"></div>
+                    </div>
+                    <div class="field"><label>Várias etiquetas (opcional, um título por linha)</label><textarea id="et_lista" style="min-height:90px" placeholder="Se preenchido, gera uma etiqueta para cada linha, usando os demais campos iguais."></textarea></div>
+                    <div class="btn-row">
+                        <button class="btn" onclick="gerarEtiquetas()">Gerar etiquetas</button>
+                        <button class="btn btn-secondary" onclick="imprimirArea('et_area')">Imprimir</button>
+                    </div>
+                    <p class="out-note" id="et_msg"></p>
+                    <div class="preview-wrap"><div class="print-area etiquetas" id="et_area"></div></div>
+                </div>
+                <div class="info-card">
+                    <div class="info-icon">🏷️</div>
+                    <h3>Para imprimir</h3>
+                    <p>As etiquetas têm tamanho real em centímetros. O botão Imprimir abre a impressão do navegador; se não abrir, use Ctrl+P (Cmd+P no Mac). Em planilhas de etiquetas adesivas, ajuste a escala para 100%.</p>
+                    
+                </div>
+            </div>
+        </section>
+
+        <section class="tool" id="crachas">
+            <div class="heading">
+                <h1>Gerador de Crachás</h1>
+                <p>Crie crachás com nome, cargo e fotografia.</p>
+            </div>
+            <div class="workspace">
+                <div class="card">
+<div class="field"><label>Nome</label><input type="text" id="cr_nome" value="Maria da Silva" oninput="atualizarCracha()"></div>
+                    <div class="field"><label>Cargo</label><input type="text" id="cr_cargo" value="Analista Administrativa" oninput="atualizarCracha()"></div>
+                    <div class="two-columns">
+                        <div class="field"><label>Empresa / Instituição</label><input type="text" id="cr_emp" value="Minha Empresa" oninput="atualizarCracha()"></div>
+                        <div class="field"><label>Matrícula (opcional)</label><input type="text" id="cr_id" placeholder="Ex.: 004512" oninput="atualizarCracha()"></div>
+                    </div>
+                    <div class="two-columns">
+                        <div class="field"><label>Formato</label><select id="cr_fmt" onchange="atualizarCracha()"><option value="v">Vertical (5,4 × 8,6 cm)</option><option value="h">Horizontal / cartão (8,6 × 5,4 cm)</option></select></div>
+                        <div class="field"><label>Furo para cordão ou clipe</label><label class="check" style="height:45px;margin:0"><input type="checkbox" id="cr_furo" checked onchange="atualizarCracha()"> Incluir furo (guia de corte)</label></div>
+                    </div>
+                    <div class="two-columns">
+                        <div class="field"><label>Cor do crachá</label><input type="color" id="cr_cor" value="#123d2b" style="padding:4px" oninput="atualizarCracha()"></div>
+                        <div class="field"><label>Fotografia</label><input type="file" id="cr_foto" accept="image/*" style="padding:10px 12px;height:auto"></div>
+                    </div>
+                    <div class="btn-row">
+                        <button class="btn btn-secondary" onclick="removerFoto()">Remover foto</button>
+                        <button class="btn" onclick="imprimirArea('cr_area')">Imprimir crachá</button>
+                    </div>
+                    <div class="preview-wrap" style="display:block"><div class="print-area" id="cr_area"></div></div>
+                </div>
+                <div class="info-card">
+                    <div class="info-icon">🪪</div>
+                    <h3>Tamanho padrão</h3>
+                    <p>O crachá tem o tamanho de cartão padrão (8,6 × 5,4 cm), vertical ou horizontal. Sem o furo ele serve como cartão; com o furo, aparece uma fenda de 1,3 cm para cordão ou clipe. A foto fica apenas no seu navegador e não é enviada a lugar nenhum.</p>
+                    
+                </div>
+            </div>
+        </section>
+
+        <section class="tool" id="protocolos">
+            <div class="heading">
+                <h1>Gerador de Protocolos</h1>
+                <p>Crie comprovantes de recebimento e entrega de documentos.</p>
+            </div>
+            <div class="workspace">
+                <div class="card">
+<div class="two-columns">
+                        <div class="field"><label>Tipo de comprovante</label><select id="pr_tipo"><option value="recebimento">Recebimento</option><option value="entrega">Entrega</option></select></div>
+                        <div class="field"><label>Nº do protocolo</label><div style="display:flex;gap:8px"><input type="text" id="pr_num"><button class="btn btn-secondary" style="width:auto;padding:0 14px" onclick="novoNumeroProtocolo()" title="Gerar novo número">↻</button></div></div>
+                    </div>
+                    <div class="field"><label>Data e hora</label><input type="datetime-local" id="pr_data"></div>
+                    <div class="two-columns">
+                        <div class="field"><label>Entregue por</label><input type="text" id="pr_de" placeholder="Nome de quem entrega"></div>
+                        <div class="field"><label>Recebido por</label><input type="text" id="pr_para" placeholder="Nome de quem recebe"></div>
+                    </div>
+                    <div class="field"><label>Setor / órgão (opcional)</label><input type="text" id="pr_setor" placeholder="Ex.: Secretaria Acadêmica"></div>
+                    <div class="field"><label>Documento(s)</label><textarea id="pr_doc" style="min-height:90px" placeholder="Descreva os documentos. Ex.: Contrato social, cópia de RG e comprovante de endereço"></textarea></div>
+                    <div class="two-columns">
+                        <div class="field"><label>Quantidade</label><input type="number" id="pr_qtd" value="1" min="1"></div>
+                        <div class="field"><label>Unidade</label><select id="pr_un"><option>documento(s)</option><option>folha(s)</option><option>volume(s)</option><option>via(s)</option><option>pasta(s)</option></select></div>
+                    </div>
+                    <div class="field"><label>Observações (opcional)</label><input type="text" id="pr_obs"></div>
+                    <div class="btn-row">
+                        <button class="btn" onclick="gerarProtocolo()">Gerar comprovante</button>
+                        <button class="btn btn-secondary" onclick="imprimirArea('pr_area')">Imprimir</button>
+                        <button class="btn btn-secondary" onclick="copiar('pr_txt')">▣ Copiar texto</button>
+                    </div>
+                    <p class="out-note" id="pr_msg"></p>
+                    <div id="pr_txt" style="display:none"></div>
+                    <div class="preview-wrap"><div class="print-area" id="pr_area"></div></div>
+                </div>
+                <div class="info-card">
+                    <div class="info-icon">📄</div>
+                    <h3>Comprovante com assinaturas</h3>
+                    <p>O comprovante traz número, data, partes, descrição e campos para assinatura. O número do protocolo é gerado automaticamente e pode ser refeito no botão ↻.</p>
+                    
+                </div>
+            </div>
+        </section>
+
+        <section class="tool" id="aleatorio">
+            <div class="heading">
+                <h1>Sorteios e Números Aleatórios</h1>
+                <p>Sorteie números ou nomes (um ganhador por vez), jogue dados ou tire cara ou coroa.</p>
+            </div>
+            <div class="workspace">
+                <div class="card">
+<div class="tabs">
+                        <button class="mtab active" data-group="rn" data-panel="rn1">Sortear números</button>
+                        <button class="mtab" data-group="rn" data-panel="rn4">Sortear nome</button>
+                        <button class="mtab" data-group="rn" data-panel="rn2">Jogar dados</button>
+                        <button class="mtab" data-group="rn" data-panel="rn3">Cara ou coroa</button>
+                    </div>
+                    <div class="mpanel active" data-group="rn" id="rn1">
+                        <div class="two-columns">
+                            <div class="field"><label>Mínimo</label><input type="number" id="rn_min" value="1"></div>
+                            <div class="field"><label>Máximo</label><input type="number" id="rn_max" value="60"></div>
+                        </div>
+                        <div class="field"><label>Quantos números?</label><input type="number" id="rn_qtd" value="6" min="1" max="1000"></div>
+                        <label class="check"><input type="checkbox" id="rn_rep"> Permitir repetição</label>
+                        <label class="check"><input type="checkbox" id="rn_ord" checked> Ordenar em ordem crescente</label>
+                        <button class="btn" onclick="sortearNumeros()">Sortear</button>
+                    </div>
+                    <div class="mpanel" data-group="rn" id="rn4">
+                        <div class="field"><label>Lista de nomes (um por linha)</label><textarea id="rm_lista" placeholder="Maria&#10;João&#10;Ana&#10;Carlos"></textarea></div>
+                        <p class="out-note" id="rm_cont" style="margin:-8px 0 14px"></p>
+                        <label class="check"><input type="checkbox" id="rm_tirar" checked> Retirar o sorteado da lista (ninguém ganha duas vezes)</label>
+                        <div class="btn-row">
+                            <button class="btn" id="rm_btn" onclick="sortearNome()">🎁 Sortear 1 nome</button>
+                            <button class="btn btn-secondary" onclick="restaurarNomes()">Restaurar lista</button>
+                        </div>
+                    </div>
+                    <div class="mpanel" data-group="rn" id="rn2">
+                        <div class="two-columns">
+                            <div class="field"><label>Quantidade de dados</label><input type="number" id="rd_qtd" value="2" min="1" max="100"></div>
+                            <div class="field"><label>Faces</label><select id="rd_faces"><option value="4">D4</option><option value="6" selected>D6</option><option value="8">D8</option><option value="10">D10</option><option value="12">D12</option><option value="20">D20</option><option value="100">D100</option></select></div>
+                        </div>
+                        <button class="btn" onclick="jogarDados()">🎲 Jogar dados</button>
+                    </div>
+                    <div class="mpanel" data-group="rn" id="rn3">
+                        <div class="field"><label>Quantas vezes?</label><input type="number" id="rc_qtd" value="1" min="1" max="100"></div>
+                        <button class="btn" onclick="cairMoeda()">🪙 Lançar moeda</button>
+                    </div>
+                    <div class="result-box" id="r_rn">
+                        <div class="result-label" id="l_rn">Resultado</div>
+                        <div class="result-value" id="v_rn"></div>
+                        <div class="result-description" id="d_rn"></div>
+                        <div class="stat-grid" id="s_rn"></div>
+                        <div class="result-actions"><button onclick="copiar('v_rn')">▣ Copiar resultado</button></div>
+                    </div>
+                    <div class="sep"></div>
+                    <h3 class="card-title">Histórico de sorteios</h3>
+                    <p class="card-subtitle" id="rn_hist_n"></p>
+                    <div class="hist" id="rn_hist"></div>
+                    <div id="rn_hist_txt" style="display:none"></div>
+                    <div class="btn-row">
+                        <button class="btn btn-secondary" onclick="copiar('rn_hist_txt')">▣ Copiar histórico</button>
+                        <button class="btn btn-secondary" onclick="limparHist()">Limpar histórico</button>
+                    </div>
+                </div>
+                <div class="info-card">
+                    <div class="info-icon">🎲</div>
+                    <h3>Aleatoriedade segura</h3>
+                    <p>Usa o gerador criptográfico do navegador (crypto.getRandomValues), com sorteio sem viés. Nada é enviado para fora da página. Todo sorteio fica registrado no histórico, para acompanhamento.</p>
+                    
+                </div>
+            </div>
+        </section>
+
+    </main>
+</div>
+
+<script>
+// NAVEGAÇÃO PRINCIPAL
+
+document.querySelectorAll('.nav-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+        document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+        document.querySelectorAll('.tool').forEach(t => t.classList.remove('active'));
+
+        btn.classList.add('active');
+        document.getElementById(btn.dataset.tool).classList.add('active');
+
+        document.getElementById('breadcrumb').textContent =
+            btn.textContent.trim().replace(/^\S+\s+/, '');
+        window.scrollTo(0, 0);
+
+    });
+});
+
+// ABAS DA PORCENTAGEM
+
+document.querySelectorAll('.tab').forEach(btn => {
+    btn.addEventListener('click', () => {
+        document.querySelectorAll('.tab').forEach(b => b.classList.remove('active'));
+        document.querySelectorAll('.percent-panel').forEach(p => p.classList.remove('active'));
+
+        btn.classList.add('active');
+        document.getElementById(btn.dataset.percent).classList.add('active');
+
+        document.getElementById('resultadoPercentual').style.display = 'none';
+    });
+});
+
+// FORMATAÇÃO
+
+function formatar(n) {
+    return n.toLocaleString('pt-BR', {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 8
+    });
+}
+
+function ler(id) {
+    const valor = document.getElementById(id).value.trim().replace(',', '.');
+    return valor === '' ? NaN : Number(valor);
+}
+
+function mostrar(id) {
+    document.getElementById(id).style.display = 'block';
+}
+
+// NÚMEROS POR EXTENSO
+
+const unidades = [
+    '', 'um', 'dois', 'três', 'quatro', 'cinco',
+    'seis', 'sete', 'oito', 'nove', 'dez',
+    'onze', 'doze', 'treze', 'quatorze', 'quinze',
+    'dezesseis', 'dezessete', 'dezoito', 'dezenove'
+];
+const dezenas = ['', '', 'vinte', 'trinta', 'quarenta', 'cinquenta', 'sessenta', 'setenta', 'oitenta', 'noventa'];
+const centenas = ['', 'cento', 'duzentos', 'trezentos', 'quatrocentos', 'quinhentos', 'seiscentos', 'setecentos', 'oitocentos', 'novecentos'];
+const escalas = [
+    ['', ''],
+    ['mil', 'mil'],
+    ['milhão', 'milhões'],
+    ['bilhão', 'bilhões'],
+    ['trilhão', 'trilhões'],
+    ['quatrilhão', 'quatrilhões']
+];
+
+function ate999(n) {
+    if (n === 0) return '';
+    if (n === 100) return 'cem';
+    const partes = [];
+    const c = Math.floor(n / 100);
+    const resto = n % 100;
+    if (c) partes.push(centenas[c]);
+    if (resto) {
+        if (resto < 20) partes.push(unidades[resto]);
+        else {
+            const d = Math.floor(resto / 10);
+            const u = resto % 10;
+            partes.push(u ? dezenas[d] + ' e ' + unidades[u] : dezenas[d]);
+        }
+    }
+    return partes.join(' e ');
+}
+
+function inteiroExtenso(valor) {
+    let n = BigInt(valor);
+    if (n === 0n) return 'zero';
+
+    const grupos = [];
+    while (n > 0n) {
+        grupos.push(Number(n % 1000n));
+        n = n / 1000n;
+    }
+    if (grupos.length > escalas.length) return null;
+
+    const blocos = [];
+    for (let i = grupos.length - 1; i >= 0; i--) {
+        const g = grupos[i];
+        if (g === 0) continue;
+        let texto;
+        if (i === 1 && g === 1) texto = 'mil';
+        else if (i === 0) texto = ate999(g);
+        else texto = ate999(g) + ' ' + escalas[i][g === 1 ? 0 : 1];
+        blocos.push({ texto, g });
+    }
+
+    let resultado = blocos[0].texto;
+    for (let i = 1; i < blocos.length; i++) {
+        const g = blocos[i].g;
+        const ultimo = i === blocos.length - 1;
+        const conecta = ultimo && (g < 100 || g % 100 === 0);
+        resultado += (conecta ? ' e ' : ', ') + blocos[i].texto;
+    }
+    return resultado;
+}
+
+function lerNumeroBR(texto) {
+    let t = texto.trim().replace(/\s/g, '').replace(/^R\$/i, '');
+    if (!t) return null;
+
+    let negativo = false;
+    if (t.startsWith('-')) { negativo = true; t = t.slice(1); }
+
+    if (t.includes(',')) {
+        t = t.replace(/\./g, '').replace(',', '.');
+    } else if (/^\d+\.\d{1,2}$/.test(t)) {
+        // ponto com 1-2 casas = decimal
+    } else {
+        t = t.replace(/\./g, '');
+    }
+
+    if (!/^\d+(\.\d+)?$/.test(t)) return null;
+    const [inteiro, decimal = ''] = t.split('.');
+    return { negativo, inteiro: inteiro.replace(/^0+(?=\d)/, ''), decimal };
+}
+
+function nomeDecimal(casas) {
+    const nomes = ['', 'décimos', 'centésimos', 'milésimos', 'décimos de milésimos', 'centésimos de milésimos', 'milionésimos'];
+    return nomes[casas] || null;
+}
+
+function converterExtenso() {
+    const entrada = document.getElementById('numero').value;
+    const formato = document.getElementById('formato').value;
+    const saida = document.getElementById('textoExtenso');
+    const num = lerNumeroBR(entrada);
+
+    mostrar('resultadoExtenso');
+
+    if (!num) {
+        saida.textContent = 'Digite um número válido. Ex.: 1250,50';
+        return;
+    }
+
+    let texto;
+    const inteiroTxt = inteiroExtenso(num.inteiro);
+    if (inteiroTxt === null) {
+        saida.textContent = 'Número muito grande. O limite é de 999 quatrilhões.';
+        return;
+    }
+
+    if (formato === 'moeda') {
+        const centavosStr = (num.decimal + '00').slice(0, 2);
+        const centavos = parseInt(centavosStr, 10);
+        const inteiroBig = BigInt(num.inteiro);
+        const partes = [];
+
+        if (inteiroBig > 0n || centavos === 0) {
+            const de = (inteiroBig >= 1000000n && inteiroBig % 1000000n === 0n) ? ' de' : '';
+            partes.push(inteiroTxt + de + (inteiroBig === 1n ? ' real' : ' reais'));
+        }
+        if (centavos > 0) {
+            partes.push(inteiroExtenso(centavos) + (centavos === 1 ? ' centavo' : ' centavos'));
+        }
+        texto = partes.join(' e ');
+    } else {
+        texto = inteiroTxt;
+        const dec = num.decimal.replace(/0+$/, '');
+        if (dec) {
+            const nome = nomeDecimal(dec.length);
+            const dTxt = inteiroExtenso(dec.replace(/^0+(?=\d)/, ''));
+            texto += ' vírgula ' + (nome ? dTxt + ' ' + nome : dec.split('').map(d => d === '0' ? 'zero' : unidades[+d]).join(' '));
+        }
+    }
+
+    if (num.negativo && !/^zero/.test(texto)) texto = 'menos ' + texto;
+    saida.textContent = texto.charAt(0).toUpperCase() + texto.slice(1) + '.';
+}
+
+// REGRA DE 3
+
+function calcularRegra() {
+    const a = ler('ra'), b = ler('rb'), c = ler('rc');
+    const valor = document.getElementById('valorRegra');
+    const detalhe = document.getElementById('detalheRegra');
+    mostrar('resultadoRegra');
+
+    if ([a, b, c].some(isNaN)) {
+        valor.textContent = '—';
+        detalhe.textContent = 'Preencha os valores A, B e C.';
+        return;
+    }
+    if (a === 0) {
+        valor.textContent = '—';
+        detalhe.textContent = 'O valor A não pode ser zero.';
+        return;
+    }
+    const x = (b * c) / a;
+    valor.textContent = formatar(x);
+    detalhe.textContent = `X = (${formatar(b)} × ${formatar(c)}) ÷ ${formatar(a)}`;
+}
+
+// PORCENTAGEM
+
+function calcularPercentual(tipo) {
+    const titulo = document.getElementById('tituloPercentual');
+    const valor = document.getElementById('valorPercentual');
+    const detalhe = document.getElementById('detalhePercentual');
+    const a = ler(tipo + 'a'), b = ler(tipo + 'b');
+    mostrar('resultadoPercentual');
+
+    if (isNaN(a) || isNaN(b)) {
+        titulo.textContent = 'Atenção';
+        valor.textContent = '—';
+        detalhe.textContent = 'Preencha todos os campos.';
+        return;
+    }
+
+    switch (tipo) {
+        case 'p1': {
+            const r = (a / 100) * b;
+            titulo.textContent = 'Valor encontrado';
+            valor.textContent = formatar(r);
+            detalhe.textContent = `${formatar(a)}% de ${formatar(b)} = ${formatar(r)}`;
+            break;
+        }
+        case 'p2': {
+            if (b === 0) return erroPercentual('O valor total não pode ser zero.');
+            const r = (a / b) * 100;
+            titulo.textContent = 'Percentual';
+            valor.textContent = formatar(r) + '%';
+            detalhe.textContent = `${formatar(a)} representa ${formatar(r)}% de ${formatar(b)}`;
+            break;
+        }
+        case 'p3': {
+            if (a === 0) return erroPercentual('O valor inicial não pode ser zero.');
+            const r = ((b - a) / Math.abs(a)) * 100;
+            titulo.textContent = r >= 0 ? 'Aumento' : 'Redução';
+            valor.textContent = formatar(Math.abs(r)) + '%';
+            detalhe.textContent = `De ${formatar(a)} para ${formatar(b)}: variação de ${formatar(r)}%`;
+            break;
+        }
+        case 'p4': {
+            const r = a * (1 + b / 100);
+            titulo.textContent = 'Valor com acréscimo';
+            valor.textContent = formatar(r);
+            detalhe.textContent = `${formatar(a)} + ${formatar(b)}% = ${formatar(r)} (acréscimo de ${formatar(r - a)})`;
+            break;
+        }
+        case 'p5': {
+            const r = a * (1 - b / 100);
+            titulo.textContent = 'Valor com desconto';
+            valor.textContent = formatar(r);
+            detalhe.textContent = `${formatar(a)} − ${formatar(b)}% = ${formatar(r)} (desconto de ${formatar(a - r)})`;
+            break;
+        }
+    }
+}
+
+function erroPercentual(msg) {
+    document.getElementById('tituloPercentual').textContent = 'Atenção';
+    document.getElementById('valorPercentual').textContent = '—';
+    document.getElementById('detalhePercentual').textContent = msg;
+}
+
+// COPIAR
+
+function copiar(id) {
+    const alvo = document.getElementById(id);
+    const texto = alvo.tagName === 'TEXTAREA' ? alvo.value : alvo.textContent;
+    const btn = event && event.currentTarget;
+    const feito = () => {
+        if (!btn) return;
+        const original = btn.textContent;
+        btn.textContent = '✓ Copiado';
+        setTimeout(() => btn.textContent = original, 1400);
+    };
+    if (navigator.clipboard && window.isSecureContext) {
+        navigator.clipboard.writeText(texto).then(feito).catch(() => fallback(texto, feito));
+    } else {
+        fallback(texto, feito);
+    }
+}
+
+function fallback(texto, cb) {
+    const t = document.createElement('textarea');
+    t.value = texto;
+    document.body.appendChild(t);
+    t.select();
+    try { document.execCommand('copy'); cb(); } catch (e) {}
+    t.remove();
+}
+
+// ===== UTILITÁRIOS DAS NOVAS FERRAMENTAS =====
+
+function val(id) { return document.getElementById(id).value; }
+function chk(id) { return document.getElementById(id).checked; }
+function pl(n, s, p) { return n + ' ' + (n === 1 ? s : p); }
+function fmtInt(n) { return n.toLocaleString('pt-BR'); }
+
+function fmtNum(n) {
+    if (!isFinite(n)) return '—';
+    n = Number(n.toPrecision(12));
+    if (n === 0) return '0';
+    const a = Math.abs(n);
+    if (a >= 1e15 || a < 1e-7) return n.toExponential(6).replace('.', ',');
+    return n.toLocaleString('pt-BR', { maximumFractionDigits: 10 });
+}
+
+function out(x, label, value, desc, stats) {
+    mostrar('r_' + x);
+    document.getElementById('l_' + x).textContent = label;
+    document.getElementById('v_' + x).textContent = value;
+    document.getElementById('d_' + x).textContent = desc || '';
+    const s = document.getElementById('s_' + x);
+    if (s) {
+        s.replaceChildren();
+        (stats || []).forEach(([k, v]) => {
+            const box = document.createElement('div');
+            box.className = 'stat';
+            const b = document.createElement('b'); b.textContent = v;
+            const sp = document.createElement('span'); sp.textContent = k;
+            box.append(b, sp);
+            s.appendChild(box);
+        });
+    }
+}
+function erro(x, msg) { out(x, 'Atenção', '—', msg); }
+function ocultar(x) { document.getElementById('r_' + x).style.display = 'none'; }
+
+function limpar(tag, cls, txt) {
+    const e = document.createElement(tag);
+    if (cls) e.className = cls;
+    if (txt != null) e.textContent = txt;
+    return e;
+}
+
+function imprimirArea(id) {
+    const area = document.getElementById(id);
+    if (!area || !area.children.length) return;
+    try { window.print(); } catch (e) {}
+}
+
+// MINI-ABAS
+document.querySelectorAll('.mtab').forEach(b => {
+    b.addEventListener('click', () => {
+        const g = b.dataset.group;
+        document.querySelectorAll('.mtab[data-group="' + g + '"]').forEach(x => x.classList.remove('active'));
+        document.querySelectorAll('.mpanel[data-group="' + g + '"]').forEach(p => p.classList.remove('active'));
+        b.classList.add('active');
+        document.getElementById(b.dataset.panel).classList.add('active');
+        ocultar(g);
+    });
+});
+
+// ===== DATAS =====
+
+const DIAS_SEMANA = ['domingo', 'segunda-feira', 'terça-feira', 'quarta-feira', 'quinta-feira', 'sexta-feira', 'sábado'];
+const MESES = ['janeiro', 'fevereiro', 'março', 'abril', 'maio', 'junho', 'julho', 'agosto', 'setembro', 'outubro', 'novembro', 'dezembro'];
+
+function isoParse(s) {
+    const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(s || '');
+    if (!m) return null;
+    const y = +m[1], mo = +m[2], d = +m[3];
+    if (y < 1000) return null;
+    const dt = new Date(Date.UTC(y, mo - 1, d));
+    return dt.getUTCMonth() === mo - 1 ? dt : null;
+}
+function hojeUTC() {
+    const n = new Date();
+    return new Date(Date.UTC(n.getFullYear(), n.getMonth(), n.getDate()));
+}
+function dd(n) { return String(n).padStart(2, '0'); }
+function fmtData(dt) { return dd(dt.getUTCDate()) + '/' + dd(dt.getUTCMonth() + 1) + '/' + dt.getUTCFullYear(); }
+function fmtDataLonga(dt) {
+    return DIAS_SEMANA[dt.getUTCDay()] + ', ' + dt.getUTCDate() + ' de ' + MESES[dt.getUTCMonth()] + ' de ' + dt.getUTCFullYear();
+}
+function diffDias(a, b) { return Math.round((b - a) / 864e5); }
+function diasNoMes(y, m) { return new Date(Date.UTC(y, m + 1, 0)).getUTCDate(); }
+function addDias(dt, n) { return new Date(dt.getTime() + n * 864e5); }
+function addMeses(dt, n) {
+    const base = new Date(Date.UTC(dt.getUTCFullYear(), dt.getUTCMonth() + n, 1));
+    const y = base.getUTCFullYear(), m = base.getUTCMonth();
+    return new Date(Date.UTC(y, m, Math.min(dt.getUTCDate(), diasNoMes(y, m))));
+}
+function difYMD(a, b) {
+    let tm = (b.getUTCFullYear() - a.getUTCFullYear()) * 12 + (b.getUTCMonth() - a.getUTCMonth());
+    if (addMeses(a, tm) > b) tm--;
+    const d = diffDias(addMeses(a, tm), b);
+    return { y: Math.floor(tm / 12), m: tm % 12, d, totalMeses: tm };
+}
+function textoYMD(r) {
+    const p = [];
+    if (r.y) p.push(pl(r.y, 'ano', 'anos'));
+    if (r.m) p.push(pl(r.m, 'mês', 'meses'));
+    if (r.d || !p.length) p.push(pl(r.d, 'dia', 'dias'));
+    return p.length > 1 ? p.slice(0, -1).join(', ') + ' e ' + p[p.length - 1] : p[0];
+}
+function diasUteisEntre(a, b) { // a inclusive, b exclusivo
+    let c = 0;
+    for (let d = new Date(a); d < b; d = addDias(d, 1)) {
+        const w = d.getUTCDay();
+        if (w !== 0 && w !== 6) c++;
+    }
+    return c;
+}
+function ehBissexto(y) { return (y % 4 === 0 && y % 100 !== 0) || y % 400 === 0; }
+
+// SIGNOS
+
+const SIGNOS = {
+    'Áries': ['♈', '21/03 a 19/04', 'Fogo', 'Marte', 'Corajoso, impulsivo e cheio de iniciativa.'],
+    'Touro': ['♉', '20/04 a 20/05', 'Terra', 'Vênus', 'Persistente, leal e apreciador do conforto.'],
+    'Gêmeos': ['♊', '21/05 a 20/06', 'Ar', 'Mercúrio', 'Curioso, comunicativo e adaptável.'],
+    'Câncer': ['♋', '21/06 a 22/07', 'Água', 'Lua', 'Sensível, protetor e muito ligado à família.'],
+    'Leão': ['♌', '23/07 a 22/08', 'Fogo', 'Sol', 'Carismático, generoso e com espírito de liderança.'],
+    'Virgem': ['♍', '23/08 a 22/09', 'Terra', 'Mercúrio', 'Detalhista, prático e analítico.'],
+    'Libra': ['♎', '23/09 a 22/10', 'Ar', 'Vênus', 'Diplomático, sociável e amante da harmonia.'],
+    'Escorpião': ['♏', '23/10 a 21/11', 'Água', 'Plutão', 'Intenso, determinado e reservado.'],
+    'Sagitário': ['♐', '22/11 a 21/12', 'Fogo', 'Júpiter', 'Otimista, aventureiro e amante da liberdade.'],
+    'Capricórnio': ['♑', '22/12 a 19/01', 'Terra', 'Saturno', 'Disciplinado, responsável e ambicioso.'],
+    'Aquário': ['♒', '20/01 a 18/02', 'Ar', 'Urano', 'Original, independente e humanitário.'],
+    'Peixes': ['♓', '19/02 a 20/03', 'Água', 'Netuno', 'Intuitivo, sonhador e empático.']
+};
+const LIMITES_SIGNO = [[119, 'Capricórnio'], [218, 'Aquário'], [320, 'Peixes'], [419, 'Áries'], [520, 'Touro'], [620, 'Gêmeos'],
+    [722, 'Câncer'], [822, 'Leão'], [922, 'Virgem'], [1022, 'Libra'], [1121, 'Escorpião'], [1221, 'Sagitário']];
+
+function signoDe(dt) {
+    const k = (dt.getUTCMonth() + 1) * 100 + dt.getUTCDate();
+    const f = LIMITES_SIGNO.find(x => k <= x[0]);
+    return f ? f[1] : 'Capricórnio';
+}
+function calcularSigno() {
+    const dt = isoParse(val('sg_data'));
+    if (!dt) return erro('sg', 'Informe uma data de nascimento válida.');
+    const nome = signoDe(dt), s = SIGNOS[nome];
+    out('sg', 'Seu signo', s[0] + ' ' + nome, s[4], [
+        ['Período', s[1]], ['Elemento', s[2]], ['Planeta regente', s[3]], ['Data informada', fmtData(dt)]
+    ]);
+}
+
+// IDADE
+
+function calcularIdade() {
+    const n = isoParse(val('id_nasc'));
+    if (!n) return erro('id', 'Informe uma data de nascimento válida.');
+    const refStr = val('id_ref');
+    const ref = refStr ? isoParse(refStr) : hojeUTC();
+    if (!ref) return erro('id', 'A data de referência é inválida.');
+    if (ref < n) return erro('id', 'A data de nascimento não pode ser posterior à data de referência.');
+
+    const r = difYMD(n, ref), dias = diffDias(n, ref);
+    const bday = y => (n.getUTCMonth() === 1 && n.getUTCDate() === 29 && !ehBissexto(y))
+        ? new Date(Date.UTC(y, 1, 28)) : new Date(Date.UTC(y, n.getUTCMonth(), n.getUTCDate()));
+    let prox = bday(ref.getUTCFullYear());
+    if (prox < ref) prox = bday(ref.getUTCFullYear() + 1);
+    const falta = diffDias(ref, prox);
+    const idadeProx = prox.getUTCFullYear() - n.getUTCFullYear();
+
+    out('id', 'Sua idade', textoYMD(r),
+        falta === 0 ? '🎉 Hoje é aniversário!' : 'Faltam ' + pl(falta, 'dia', 'dias') + ' para completar ' + idadeProx + ' anos.', [
+        ['Anos completos', String(r.y)],
+        ['Total de meses', fmtInt(r.totalMeses)],
+        ['Total de semanas', fmtInt(Math.floor(dias / 7))],
+        ['Total de dias', fmtInt(dias)],
+        ['Total de horas', fmtInt(dias * 24)],
+        ['Nasceu em', DIAS_SEMANA[n.getUTCDay()]],
+        ['Próximo aniversário', fmtData(prox) + ' (' + DIAS_SEMANA[prox.getUTCDay()] + ')']
+    ]);
+}
+
+// SOMAR DIAS
+
+function calcularSomaDias() {
+    const dt = isoParse(val('sd_data'));
+    const q = ler('sd_qtd');
+    if (!dt) return erro('sd', 'Informe uma data inicial válida.');
+    if (isNaN(q) || q < 0 || !Number.isInteger(q)) return erro('sd', 'Informe uma quantidade inteira (0 ou mais).');
+    if (q > 100000) return erro('sd', 'Quantidade muito grande. O limite é 100.000.');
+    const sinal = Number(val('sd_op')), un = val('sd_unid');
+    let r;
+    if (un === 'dias') r = addDias(dt, sinal * q);
+    else if (un === 'semanas') r = addDias(dt, sinal * q * 7);
+    else if (un === 'meses') r = addMeses(dt, sinal * q);
+    else if (un === 'anos') r = addMeses(dt, sinal * q * 12);
+    else {
+        r = new Date(dt);
+        let f = q;
+        while (f > 0) {
+            r = addDias(r, sinal);
+            const w = r.getUTCDay();
+            if (w !== 0 && w !== 6) f--;
+        }
+    }
+    if (isNaN(r) || r.getUTCFullYear() < 1000 || r.getUTCFullYear() > 9999) return erro('sd', 'A data resultante está fora do intervalo suportado.');
+    const dias = diffDias(dt, r);
+    out('sd', 'Data resultante', fmtData(r), fmtDataLonga(r), [
+        ['Data inicial', fmtData(dt) + ' (' + DIAS_SEMANA[dt.getUTCDay()] + ')'],
+        ['Diferença', fmtInt(Math.abs(dias)) + (Math.abs(dias) === 1 ? ' dia corrido' : ' dias corridos')]
+    ]);
+}
+
+// CONTADOR
+
+function calcularContador() {
+    let a = isoParse(val('cd_a')), b = isoParse(val('cd_b'));
+    if (!a || !b) return erro('cd', 'Informe as duas datas.');
+    const inv = b < a;
+    if (inv) [a, b] = [b, a];
+    const incl = chk('cd_incl') ? 1 : 0;
+    const dias = diffDias(a, b) + incl;
+    const r = difYMD(a, b);
+    const uteis = diasUteisEntre(a, addDias(b, incl));
+    const sem = Math.floor(dias / 7);
+    out('cd', 'Diferença', pl(dias, 'dia', 'dias'),
+        (inv ? 'A data final é anterior à inicial; o intervalo foi calculado entre as duas. ' : '') +
+        'De ' + fmtData(a) + ' a ' + fmtData(b) + (incl ? ' (incluindo o dia final).' : '.'), [
+        ['Em anos, meses e dias', textoYMD(r)],
+        ['Semanas', sem + ' sem. e ' + (dias % 7) + ' d.'],
+        ['Dias úteis (seg–sex)', fmtInt(uteis)],
+        ['Total de horas', fmtInt(dias * 24)]
+    ]);
+}
+
+// ===== IMC =====
+
+function f1(n) { return n.toLocaleString('pt-BR', { minimumFractionDigits: 1, maximumFractionDigits: 1 }); }
+
+function calcularIMC() {
+    const peso = ler('imc_peso');
+    let alt = ler('imc_alt');
+    if (isNaN(peso) || isNaN(alt)) return erro('imc', 'Informe peso e altura.');
+    if (alt > 3) alt = alt / 100;
+    if (peso < 1 || peso > 500 || alt < 0.5 || alt > 2.5) return erro('imc', 'Valores fora do intervalo esperado. Peso em kg e altura em cm (ex.: 175) ou metros (ex.: 1,75).');
+    const imc = peso / (alt * alt);
+    let cl;
+    if (imc < 18.5) cl = 'Abaixo do peso';
+    else if (imc < 25) cl = 'Peso normal';
+    else if (imc < 30) cl = 'Sobrepeso';
+    else if (imc < 35) cl = 'Obesidade grau I';
+    else if (imc < 40) cl = 'Obesidade grau II';
+    else cl = 'Obesidade grau III';
+    const min = 18.5 * alt * alt, max = 24.9 * alt * alt;
+    let ajuste = 'Dentro da faixa normal';
+    if (peso < min) ajuste = 'Ganhar ' + f1(min - peso) + ' kg';
+    else if (peso > max) ajuste = 'Reduzir ' + f1(peso - max) + ' kg';
+    out('imc', 'Seu IMC', imc.toLocaleString('pt-BR', { minimumFractionDigits: 1, maximumFractionDigits: 1 }),
+        cl + '. Indicador geral; não substitui avaliação de um profissional de saúde.', [
+        ['Classificação', cl],
+        ['Faixa de peso normal', f1(min) + ' a ' + f1(max) + ' kg'],
+        ['Para chegar à faixa', ajuste]
+    ]);
+    const pos = Math.max(0, Math.min(100, (imc - 15) / 25 * 100));
+    document.getElementById('imc_mk').style.left = 'calc(' + pos + '% - 2px)';
+}
+
+// ===== CONVERSOR DE UNIDADES =====
+
+const UNID = {
+    comprimento: ['Comprimento', [['Milímetro (mm)', 0.001], ['Centímetro (cm)', 0.01], ['Metro (m)', 1], ['Quilômetro (km)', 1000], ['Polegada (in)', 0.0254], ['Pé (ft)', 0.3048], ['Jarda (yd)', 0.9144], ['Milha (mi)', 1609.344], ['Milha náutica', 1852]], 2, 5],
+    peso: ['Peso / massa', [['Miligrama (mg)', 1e-6], ['Grama (g)', 0.001], ['Quilograma (kg)', 1], ['Tonelada (t)', 1000], ['Onça (oz)', 0.028349523125], ['Libra (lb)', 0.45359237], ['Stone (st)', 6.35029318]], 2, 5],
+    temperatura: ['Temperatura', [['Celsius (°C)'], ['Fahrenheit (°F)'], ['Kelvin (K)']], 0, 1],
+    volume: ['Volume', [['Mililitro (mL)', 0.001], ['Litro (L)', 1], ['Metro cúbico (m³)', 1000], ['Colher de chá (5 mL)', 0.005], ['Colher de sopa (15 mL)', 0.015], ['Xícara (240 mL)', 0.24], ['Onça fluida US (fl oz)', 0.0295735296], ['Quarto US (qt)', 0.946352946], ['Galão US (gal)', 3.785411784], ['Galão imperial', 4.54609]], 1, 8],
+    area: ['Área', [['Centímetro² (cm²)', 1e-4], ['Metro² (m²)', 1], ['Quilômetro² (km²)', 1e6], ['Hectare (ha)', 1e4], ['Alqueire paulista', 24200], ['Pé² (ft²)', 0.09290304], ['Polegada² (in²)', 6.4516e-4], ['Jarda² (yd²)', 0.83612736], ['Acre', 4046.8564224]], 1, 5],
+    velocidade: ['Velocidade', [['Metro/segundo (m/s)', 1], ['Quilômetro/hora (km/h)', 1 / 3.6], ['Milha/hora (mph)', 0.44704], ['Nó (kn)', 1852 / 3600], ['Pé/segundo (ft/s)', 0.3048]], 1, 2],
+    dados: ['Dados', [['Bit', 0.125], ['Byte (B)', 1], ['Quilobyte (KB)', 1e3], ['Megabyte (MB)', 1e6], ['Gigabyte (GB)', 1e9], ['Terabyte (TB)', 1e12], ['Kibibyte (KiB)', 1024], ['Mebibyte (MiB)', 1048576], ['Gibibyte (GiB)', 1073741824], ['Tebibyte (TiB)', 1099511627776]], 3, 4],
+    tempo: ['Tempo', [['Milissegundo (ms)', 0.001], ['Segundo (s)', 1], ['Minuto (min)', 60], ['Hora (h)', 3600], ['Dia', 86400], ['Semana', 604800], ['Mês (médio)', 2629746], ['Ano (médio)', 31556952]], 3, 2],
+    pressao: ['Pressão', [['Pascal (Pa)', 1], ['Quilopascal (kPa)', 1e3], ['Bar', 1e5], ['Atmosfera (atm)', 101325], ['PSI', 6894.757293168], ['mmHg', 133.322387415]], 2, 4],
+    energia: ['Energia', [['Joule (J)', 1], ['Quilojoule (kJ)', 1e3], ['Caloria (cal)', 4.184], ['Quilocaloria (kcal)', 4184], ['Watt-hora (Wh)', 3600], ['Quilowatt-hora (kWh)', 3.6e6], ['BTU', 1055.05585262]], 3, 1]
+};
+
+function tempParaC(v, i) { return i === 0 ? v : i === 1 ? (v - 32) * 5 / 9 : v - 273.15; }
+function tempDeC(c, i) { return i === 0 ? c : i === 1 ? c * 9 / 5 + 32 : c + 273.15; }
+
+function iniciarUnidades() {
+    const sel = document.getElementById('un_cat');
+    Object.keys(UNID).forEach(k => {
+        const o = document.createElement('option'); o.value = k; o.textContent = UNID[k][0]; sel.appendChild(o);
+    });
+    trocarCategoria();
+}
+function trocarCategoria() {
+    const c = UNID[val('un_cat')];
+    ['un_de', 'un_para'].forEach((id, n) => {
+        const s = document.getElementById(id);
+        s.replaceChildren();
+        c[1].forEach((u, i) => {
+            const o = document.createElement('option'); o.value = i; o.textContent = u[0]; s.appendChild(o);
+        });
+        s.value = c[2 + n];
+    });
+    converterUnidade();
+}
+function inverterUnidades() {
+    const a = document.getElementById('un_de'), b = document.getElementById('un_para');
+    [a.value, b.value] = [b.value, a.value];
+    converterUnidade();
+}
+function converterUnidade() {
+    const v = ler('un_val');
+    if (isNaN(v)) return ocultar('un');
+    const cat = val('un_cat'), lista = UNID[cat][1];
+    const i = Number(val('un_de')), j = Number(val('un_para'));
+    const conv = (de, para) => cat === 'temperatura'
+        ? tempDeC(tempParaC(v, de), para)
+        : v * lista[de][1] / lista[para][1];
+    const r = conv(i, j);
+    const stats = lista.map((u, k) => [u[0], fmtNum(conv(i, k))]);
+    out('un', 'Resultado', fmtNum(r) + ' ' + lista[j][0].replace(/\s*\(.*\)/, ''),
+        fmtNum(v) + ' ' + lista[i][0] + ' = ' + fmtNum(r) + ' ' + lista[j][0], stats);
+}
+
+// ===== TEXTO =====
+
+function contarTexto(t) {
+    const palavras = (t.match(/\S+/g) || []).length;
+    return fmtInt(t.length) + ' caracteres, ' + fmtInt(palavras) + ' palavras, ' + fmtInt(t ? t.split('\n').length : 0) + ' linhas';
+}
+
+function formatarTexto() {
+    const original = val('ft_in');
+    let t = original.replace(/\r\n?/g, '\n');
+    if (chk('ft_esc')) t = t.replace(/[^\p{L}\p{N}\s.,;:!?()\-'"%\/@]/gu, '');
+    if (chk('ft_esp')) t = t.split('\n').map(l => l.replace(/[ \t ]+/g, ' ').trim()).join('\n');
+    if (chk('ft_par')) {
+        const sep = chk('ft_vaz') ? '\n' : '\n\n';
+        t = t.split(/\n\s*\n/).map(p => p.split('\n').map(l => l.trim()).filter(Boolean).join(' ').replace(/ {2,}/g, ' ')).filter(p => p || sep === '\n\n').join(sep);
+    } else if (chk('ft_vaz')) {
+        t = t.split('\n').filter(l => l.trim() !== '').join('\n');
+    }
+    t = t.trim();
+    document.getElementById('ft_out').value = t;
+    document.getElementById('ft_info').textContent = 'Antes: ' + contarTexto(original) + '. Depois: ' + contarTexto(t) + '.';
+}
+
+const PREPS = new Set(['de', 'da', 'do', 'das', 'dos', 'e', 'di', 'du', 'del', 'van', 'von', 'em', 'para', 'por', 'com', 'a', 'o', 'as', 'os', 'na', 'no', 'nas', 'nos']);
+const PREPS_NOME = new Set(['de', 'da', 'do', 'das', 'dos', 'e', 'di', 'du', 'del', 'van', 'von']);
+
+function capPalavra(w) {
+    return w.replace(/(^|[-'’(])(\p{L})/gu, (m, a, b) => a + b.toLocaleUpperCase('pt-BR'));
+}
+function tituloCase(texto, preps) {
+    let primeira = true;
+    return texto.toLocaleLowerCase('pt-BR').split(/(\s+)/).map(tok => {
+        if (!tok || /^\s+$/.test(tok)) return tok;
+        const manter = preps && !primeira && preps.has(tok);
+        primeira = false;
+        return manter ? tok : capPalavra(tok);
+    }).join('');
+}
+
+function converterCaixa(modo) {
+    const t = val('cx_in');
+    let r;
+    if (modo === 'upper') r = t.toLocaleUpperCase('pt-BR');
+    else if (modo === 'lower') r = t.toLocaleLowerCase('pt-BR');
+    else if (modo === 'title') r = t.split('\n').map(l => tituloCase(l, chk('cx_prep') ? PREPS : null)).join('\n');
+    else r = t.toLocaleLowerCase('pt-BR').replace(/(^\s*|[.!?]\s+|\n\s*)(\p{L})/gu, (m, a, b) => a + b.toLocaleUpperCase('pt-BR'));
+    document.getElementById('cx_out').value = r;
+    document.getElementById('cx_info').textContent = contarTexto(r) + '.';
+}
+
+function organizarNomes() {
+    const linhas = val('on_in').replace(/\r\n?/g, '\n').split('\n');
+    let nomes = linhas.map(l => l.replace(/\s+/g, ' ').trim()).filter(Boolean);
+    const total = nomes.length;
+    if (chk('on_pad')) nomes = nomes.map(n => tituloCase(n, PREPS_NOME));
+    let removidos = 0;
+    if (chk('on_dup')) {
+        const vistos = new Set();
+        nomes = nomes.filter(n => {
+            const k = n.normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase();
+            if (vistos.has(k)) { removidos++; return false; }
+            vistos.add(k); return true;
+        });
+    }
+    const ord = val('on_ord');
+    if (ord !== 'manter') {
+        nomes.sort((a, b) => a.localeCompare(b, 'pt-BR', { sensitivity: 'base' }));
+        if (ord === 'za') nomes.reverse();
+    }
+    document.getElementById('on_out').value = nomes.join('\n');
+    document.getElementById('on_info').textContent = total + ' nomes lidos, ' + removidos + ' duplicados removidos, ' + nomes.length + ' na lista final.';
+}
+
+// ===== ETIQUETAS =====
+
+const CAMPOS_ETIQUETA = {
+    pasta: ['Nome da pasta', 'Subtítulo (setor, ano...)', 'Observação', 'Contratos 2026', 'Departamento Jurídico', 'Arquivo permanente'],
+    material: ['Material / item', 'Código', 'Local / responsável', 'Papel A4 75g', 'MAT-0042', 'Almoxarifado, prateleira 3'],
+    correio: ['Destinatário', 'Endereço', 'Cidade/UF – CEP', 'Maria da Silva', 'Rua das Flores, 123, Centro', 'São Paulo/SP – 01000-000']
+};
+function ajustarCamposEtiqueta() {
+    const c = CAMPOS_ETIQUETA[val('et_tipo')];
+    [1, 2, 3].forEach(i => {
+        document.getElementById('et_l' + i).textContent = c[i - 1];
+        document.getElementById('et_c' + i).placeholder = 'Ex.: ' + c[i + 2];
+    });
+}
+
+function gerarEtiquetas() {
+    const tipo = val('et_tipo'), c1 = val('et_c1').trim(), c2 = val('et_c2').trim(), c3 = val('et_c3').trim();
+    const lista = val('et_lista').split('\n').map(s => s.trim()).filter(Boolean);
+    const qtd = Math.max(1, Math.min(100, parseInt(val('et_qtd'), 10) || 1));
+    const msg = document.getElementById('et_msg'), area = document.getElementById('et_area');
+    const titulos = lista.length ? lista : (c1 ? [c1] : []);
+    area.replaceChildren();
+    if (!titulos.length) { msg.textContent = 'Preencha o campo principal (ou a lista) para gerar etiquetas.'; return; }
+    if (titulos.length * qtd > 300) { msg.textContent = 'O limite é de 300 etiquetas por vez.'; return; }
+    const tam = { p: [6, 3, 8], m: [8, 4, 10], g: [10, 5, 13] }[val('et_tam')];
+    const cor = val('et_cor');
+    const tags = { pasta: '', material: 'MATERIAL', correio: 'DESTINATÁRIO' };
+    titulos.forEach(t => {
+        for (let i = 0; i < qtd; i++) {
+            const e = limpar('div', 'etiqueta');
+            e.style.width = tam[0] + 'cm'; e.style.height = tam[1] + 'cm'; e.style.fontSize = tam[2] + 'pt';
+            const f = limpar('div', 'faixa'); f.style.background = cor;
+            const corpo = limpar('div', 'corpo');
+            if (tags[tipo]) corpo.appendChild(limpar('div', 'tag', tags[tipo]));
+            corpo.appendChild(limpar('div', 'titulo', t));
+            if (c2) corpo.appendChild(limpar('div', 'linha', (tipo === 'material' ? 'Código: ' : '') + c2));
+            if (c3) corpo.appendChild(limpar('div', 'linha', (tipo === 'material' ? 'Local: ' : '') + c3));
+            e.append(f, corpo);
+            area.appendChild(e);
+        }
+    });
+    msg.textContent = (titulos.length * qtd) + (titulos.length * qtd === 1 ? ' etiqueta gerada.' : ' etiquetas geradas.');
+}
+
+// ===== CRACHÁS =====
+
+let crFoto = null;
+
+function atualizarCracha() {
+    const area = document.getElementById('cr_area');
+    area.replaceChildren();
+    const cor = val('cr_cor');
+    const nome = val('cr_nome').trim() || 'Nome do colaborador';
+    const horiz = val('cr_fmt') === 'h', furo = chk('cr_furo');
+    const c = limpar('div', 'cracha' + (horiz ? ' h' : '') + (furo ? ' com-furo' : ''));
+    if (furo) c.appendChild(limpar('div', 'furo'));
+    const topo = limpar('div', 'topo', val('cr_emp').trim() || 'Empresa'); topo.style.background = cor;
+    const corpo = limpar('div', 'corpo');
+    const foto = limpar('div', 'foto');
+    if (crFoto) { const im = document.createElement('img'); im.src = crFoto; im.alt = 'Foto de ' + nome; foto.appendChild(im); }
+    else foto.textContent = nome.split(/\s+/).filter(Boolean).slice(0, 2).map(p => p[0].toUpperCase()).join('');
+    const txt = limpar('div', 'txt');
+    txt.appendChild(limpar('div', 'nome', nome));
+    const cargo = val('cr_cargo').trim();
+    if (cargo) txt.appendChild(limpar('div', 'cargo', cargo));
+    const mat = val('cr_id').trim();
+    if (mat) txt.appendChild(limpar('div', 'matricula', 'MAT. ' + mat));
+    corpo.append(foto, txt);
+    const rod = limpar('div', 'rodape'); rod.style.background = cor;
+    c.append(topo, corpo, rod);
+    area.appendChild(c);
+}
+function removerFoto() { crFoto = null; document.getElementById('cr_foto').value = ''; atualizarCracha(); }
+
+document.getElementById('cr_foto').addEventListener('change', e => {
+    const f = e.target.files[0];
+    if (!f) return;
+    if (!f.type.startsWith('image/') || f.size > 8 * 1024 * 1024) { e.target.value = ''; return; }
+    const rd = new FileReader();
+    rd.onload = () => { crFoto = rd.result; atualizarCracha(); };
+    rd.readAsDataURL(f);
+});
+
+// ===== PROTOCOLOS =====
+
+function rndInt(n) {
+    const buf = new Uint32Array(1);
+    const lim = Math.floor(4294967296 / n) * n;
+    let u;
+    do { crypto.getRandomValues(buf); u = buf[0]; } while (u >= lim);
+    return u % n;
+}
+
+function novoNumeroProtocolo() {
+    const d = new Date();
+    document.getElementById('pr_num').value = 'PROT-' + d.getFullYear() + dd(d.getMonth() + 1) + dd(d.getDate()) + '-' + String(rndInt(1000000)).padStart(6, '0');
+}
+function agoraLocal() {
+    const d = new Date();
+    return d.getFullYear() + '-' + dd(d.getMonth() + 1) + '-' + dd(d.getDate()) + 'T' + dd(d.getHours()) + ':' + dd(d.getMinutes());
+}
+
+function gerarProtocolo() {
+    const msg = document.getElementById('pr_msg'), area = document.getElementById('pr_area');
+    const tipo = val('pr_tipo'), num = val('pr_num').trim(), dh = val('pr_data');
+    const de = val('pr_de').trim(), para = val('pr_para').trim(), setor = val('pr_setor').trim();
+    const doc = val('pr_doc').trim(), obs = val('pr_obs').trim();
+    const qtd = val('pr_qtd'), un = val('pr_un');
+    area.replaceChildren();
+    if (!doc) { msg.textContent = 'Descreva o(s) documento(s).'; return; }
+    if (!de && !para) { msg.textContent = 'Informe ao menos quem entrega ou quem recebe.'; return; }
+    msg.textContent = '';
+    let dataTxt = '—';
+    const m = /^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2})/.exec(dh);
+    if (m) dataTxt = m[3] + '/' + m[2] + '/' + m[1] + ' às ' + m[4] + ':' + m[5];
+    const titulo = tipo === 'entrega' ? 'COMPROVANTE DE ENTREGA DE DOCUMENTOS' : 'COMPROVANTE DE RECEBIMENTO DE DOCUMENTOS';
+    const linhas = [['Data e hora', dataTxt], ['Entregue por', de || '—'], ['Recebido por', para || '—']];
+    if (setor) linhas.push(['Setor / órgão', setor]);
+    linhas.push(['Documento(s)', doc], ['Quantidade', qtd + ' ' + un]);
+    if (obs) linhas.push(['Observações', obs]);
+
+    const p = limpar('div', 'papel');
+    p.appendChild(limpar('h2', null, titulo));
+    p.appendChild(limpar('div', 'num', 'Protocolo nº ' + (num || '—')));
+    const tb = document.createElement('table');
+    linhas.forEach(([k, v]) => {
+        const tr = document.createElement('tr');
+        tr.append(limpar('td', null, k), limpar('td', null, v));
+        tr.lastChild.style.whiteSpace = 'pre-wrap';
+        tb.appendChild(tr);
+    });
+    p.appendChild(tb);
+    const ass = limpar('div', 'assinaturas');
+    [['Entregue por', de], ['Recebido por', para]].forEach(([r, n]) => {
+        const a = limpar('div', 'assina', n || '');
+        a.appendChild(limpar('small', null, r));
+        ass.appendChild(a);
+    });
+    p.appendChild(ass);
+    area.appendChild(p);
+
+    document.getElementById('pr_txt').textContent = titulo + '\nProtocolo nº ' + (num || '—') + '\n\n' +
+        linhas.map(([k, v]) => k + ': ' + v).join('\n');
+}
+
+// ===== NÚMEROS ALEATÓRIOS =====
+
+function sortearNumeros() {
+    const min = ler('rn_min'), max = ler('rn_max'), qtd = ler('rn_qtd');
+    if ([min, max, qtd].some(x => !Number.isInteger(x))) return erro('rn', 'Informe números inteiros.');
+    if (min > max) return erro('rn', 'O mínimo não pode ser maior que o máximo.');
+    if (qtd < 1 || qtd > 1000) return erro('rn', 'A quantidade deve ficar entre 1 e 1000.');
+    const faixa = max - min + 1;
+    if (faixa > 4294967296) return erro('rn', 'O intervalo é grande demais (máximo de cerca de 4,29 bilhões de valores).');
+    const rep = chk('rn_rep');
+    if (!rep && qtd > faixa) return erro('rn', 'Sem repetição, só é possível sortear até ' + fmtInt(faixa) + ' números nesse intervalo.');
+    let r = [];
+    if (rep) {
+        for (let i = 0; i < qtd; i++) r.push(min + rndInt(faixa));
+    } else if (faixa <= 200000) {
+        const pool = Array.from({ length: faixa }, (_, i) => min + i);
+        for (let i = 0; i < qtd; i++) {
+            const j = i + rndInt(faixa - i);
+            [pool[i], pool[j]] = [pool[j], pool[i]];
+            r.push(pool[i]);
+        }
+    } else {
+        const s = new Set();
+        while (s.size < qtd) s.add(min + rndInt(faixa));
+        r = [...s];
+    }
+    if (chk('rn_ord')) r.sort((a, b) => a - b);
+    const stats = [['Quantidade', String(r.length)]];
+    if (r.length > 1) stats.push(['Menor', fmtInt(Math.min(...r))], ['Maior', fmtInt(Math.max(...r))], ['Soma', fmtInt(r.reduce((a, b) => a + b, 0))]);
+    addHist('Números ' + fmtInt(min) + '–' + fmtInt(max), r.map(fmtInt).join(', '));
+    out('rn', 'Números sorteados', r.map(fmtInt).join(', '), 'Intervalo de ' + fmtInt(min) + ' a ' + fmtInt(max) + (rep ? ', com repetição.' : ', sem repetição.'), stats);
+}
+
+function jogarDados() {
+    const q = ler('rd_qtd'), f = Number(val('rd_faces'));
+    if (!Number.isInteger(q) || q < 1 || q > 100) return erro('rn', 'Escolha de 1 a 100 dados.');
+    const r = Array.from({ length: q }, () => 1 + rndInt(f));
+    const soma = r.reduce((a, b) => a + b, 0);
+    addHist(q + 'D' + f, r.join(', ') + (q > 1 ? ' (total ' + soma + ')' : ''));
+    out('rn', '🎲 ' + pl(q, 'dado', 'dados') + ' D' + f, r.join(', '), q > 1 ? 'Total: ' + soma : '', q > 1 ? [['Total', String(soma)], ['Maior', String(Math.max(...r))], ['Menor', String(Math.min(...r))]] : []);
+}
+
+function cairMoeda() {
+    const q = ler('rc_qtd');
+    if (!Number.isInteger(q) || q < 1 || q > 100) return erro('rn', 'Escolha de 1 a 100 lançamentos.');
+    const r = Array.from({ length: q }, () => rndInt(2) ? 'Cara' : 'Coroa');
+    const caras = r.filter(x => x === 'Cara').length;
+    addHist('Moeda', q === 1 ? r[0] : r.join(', ') + ' (' + caras + ' caras, ' + (q - caras) + ' coroas)');
+    out('rn', '🪙 ' + pl(q, 'lançamento', 'lançamentos'), q === 1 ? r[0] : r.join(', '), q > 1 ? 'Caras: ' + caras + ' · Coroas: ' + (q - caras) : '', []);
+}
+
+
+// ===== HISTÓRICO E SORTEIO DE NOME =====
+
+let hist = [];
+let histSeq = 0;
+const HIST_KEY = 'multicalc_historico_v1';
+
+function carregarHist() {
+    try {
+        const s = JSON.parse(localStorage.getItem(HIST_KEY) || 'null');
+        if (s && Array.isArray(s.itens)) { hist = s.itens.slice(0, 200); histSeq = s.seq || hist.length; }
+    } catch (e) {}
+}
+function salvarHist() {
+    try { localStorage.setItem(HIST_KEY, JSON.stringify({ seq: histSeq, itens: hist })); } catch (e) {}
+}
+function addHist(tipo, res) {
+    const d = new Date();
+    histSeq++;
+    hist.unshift({ n: histSeq, hora: dd(d.getDate()) + '/' + dd(d.getMonth() + 1) + ' ' + dd(d.getHours()) + ':' + dd(d.getMinutes()) + ':' + dd(d.getSeconds()), tipo, res });
+    if (hist.length > 200) hist.length = 200;
+    salvarHist();
+    renderHist();
+}
+function renderHist() {
+    const box = document.getElementById('rn_hist');
+    box.replaceChildren();
+    if (!hist.length) box.appendChild(limpar('div', 'hist-vazio', 'Nenhum sorteio realizado ainda.'));
+    hist.forEach(h => {
+        const it = limpar('div', 'hist-item');
+        it.append(limpar('span', 'hist-n', '#' + h.n), limpar('span', 'hist-h', h.hora), limpar('span', 'hist-t', h.tipo), limpar('span', 'hist-r', h.res));
+        box.appendChild(it);
+    });
+    document.getElementById('rn_hist_n').textContent = hist.length
+        ? pl(hist.length, 'sorteio registrado', 'sorteios registrados') + ' (do mais recente para o mais antigo).'
+        : 'Os sorteios feitos aqui ficam registrados para acompanhamento.';
+    document.getElementById('rn_hist_txt').textContent = hist.slice().reverse().map(h => '#' + h.n + ' | ' + h.hora + ' | ' + h.tipo + ' | ' + h.res).join('\n');
+}
+function limparHist() { hist = []; salvarHist(); renderHist(); }
+
+let rmBase = '';
+let sorteandoNome = false;
+
+function nomesDaLista() { return val('rm_lista').split(/\r?\n/).map(s => s.trim()).filter(Boolean); }
+function atualizarContNomes() {
+    const n = nomesDaLista().length;
+    document.getElementById('rm_cont').textContent = n ? pl(n, 'nome na lista.', 'nomes na lista.') : 'Digite os nomes, um por linha.';
+}
+document.getElementById('rm_lista').addEventListener('input', () => { rmBase = val('rm_lista'); atualizarContNomes(); });
+function restaurarNomes() {
+    document.getElementById('rm_lista').value = rmBase;
+    atualizarContNomes();
+}
+
+function sortearNome(aoFinal) {
+    if (sorteandoNome) return;
+    const nomes = nomesDaLista();
+    if (!nomes.length) return erro('rn', 'Digite ao menos um nome na lista.');
+    const total = nomes.length, tirar = chk('rm_tirar');
+    const btn = document.getElementById('rm_btn');
+    sorteandoNome = true; btn.disabled = true;
+    out('rn', '🎁 Sorteando...', nomes[rndInt(total)], '');
+    const vv = document.getElementById('v_rn');
+    const iv = setInterval(() => { vv.textContent = nomes[rndInt(total)]; }, 70);
+    setTimeout(() => {
+        clearInterval(iv);
+        const i = rndInt(total), vencedor = nomes[i];
+        const restantes = nomes.slice();
+        if (tirar) { restantes.splice(i, 1); document.getElementById('rm_lista').value = restantes.join('\n'); }
+        atualizarContNomes();
+        const restam = tirar ? restantes.length : total;
+        out('rn', '🏆 Nome sorteado', vencedor,
+            tirar ? 'Retirado da lista. Restam ' + pl(restam, 'nome', 'nomes') + '.' : 'A lista foi mantida (o nome pode ser sorteado de novo).',
+            [['Participantes neste sorteio', String(total)], ['Restantes na lista', String(restam)]]);
+        addHist('Nome', vencedor + ' (' + pl(total, 'participante', 'participantes') + (tirar ? ', ' + restam + ' restantes' : '') + ')');
+        sorteandoNome = false; btn.disabled = false;
+        if (aoFinal) aoFinal();
+    }, 1200);
+}
+
+// ===== INICIALIZAÇÃO =====
+carregarHist();
+renderHist();
+atualizarContNomes();
+iniciarUnidades();
+ajustarCamposEtiqueta();
+atualizarCracha();
+novoNumeroProtocolo();
+document.getElementById('pr_data').value = agoraLocal();
+
+// ENTER CONVERTE
+
+document.getElementById('numero').addEventListener('keydown', e => {
+    if (e.key === 'Enter') converterExtenso();
+});
+</script>
+</body>
+</html>
